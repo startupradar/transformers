@@ -36,6 +36,10 @@ class StartupRadarAPI:
             return response
         elif response.status_code == 403:
             raise ForbiddenError(response.json()["detail"])
+        elif response.status_code == 404:
+            raise NotFoundError(
+                f"resource not found ({url=}, response={response.json()})"
+            )
         else:
             raise StartupRadarAPIError(
                 f"unhandled status code ({response.status_code})"
