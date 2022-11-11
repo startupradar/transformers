@@ -3,3 +3,4 @@ scikit-learn
 requests
 black
 tldextract
+flake8
