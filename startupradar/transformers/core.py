@@ -2,6 +2,7 @@
 Core transformers mapping directly to API functionality.
 """
 from abc import ABC
+from collections import Counter
 
 import pandas as pd
 from sklearn.base import TransformerMixin
@@ -39,6 +40,8 @@ class LinkTransformer(SeriesTransformer):
     Creates columns for all domains the given domain links to.
     """
 
+    CUTOFF_BELOW = 2
+
     def __init__(self, api):
         super().__init__(api)
         self.columns = None
@@ -46,26 +49,39 @@ class LinkTransformer(SeriesTransformer):
 
     def fit(self, X, y=None):
         super().fit(X, y)
-        self._domains = list({b for a, b in self._fetch_tuples(X)})
+
+        # count occurrences
+        counter = Counter((b for a, b in self._fetch_tuples(X)))
+
+        # add above threshold
+        self._domains = [
+            domain for domain, count in counter.items() if count >= self.CUTOFF_BELOW
+        ]
         return self
 
     def transform(self, X, y=None):
         super().transform(X, y)
-        assert self._domains is not None, 'not fitted'
+        assert self._domains is not None, "not fitted"
 
         backlinks = self._fetch_tuples(X)
 
         rows = []
         for domain_given in X:
             for domain_link in self._domains:
-                rows.append((domain_given, domain_link, int((domain_given, domain_link) in backlinks)))
+                triple = (
+                    domain_given,
+                    domain_link,
+                    # is there a link?
+                    int((domain_given, domain_link) in backlinks),
+                )
+                rows.append(triple)
 
-        df = pd.DataFrame(rows, columns=["domain", "link", 'v'])
+        df = pd.DataFrame(rows, columns=["domain", "link", "v"])
 
         df_links = df.pivot(index="domain", columns="link", values="v")
 
         # ensure proper indexing
-        df_links = pd.DataFrame(index=X).join(df_links).fillna(0).astype(int)[self._domains]
+        df_links = pd.DataFrame(index=X).join(df_links)[self._domains]
 
         return df_links
 
@@ -80,7 +96,7 @@ class LinkTransformer(SeriesTransformer):
         return self.api.get_links(domain)
 
     def get_feature_names_out(self, feature_names_in=None):
-        assert self._domains is not None, 'not fitted'
+        assert self._domains is not None, "not fitted"
         return self._domains
 
 
@@ -101,7 +117,10 @@ class DomainTextTransformer(SeriesTransformer):
 
     def transform(self, X, y=None):
         super().transform(X, y)
-        return X.apply(self._fetch_text)
+        return pd.DataFrame(X.apply(self._fetch_text), columns=["text"])
 
     def _fetch_text(self, domain: str):
         return self.api.get_text(domain)["html_body_text"]
+
+    def get_feature_names_out(self, feature_names_in=None):
+        return ["text"]
