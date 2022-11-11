@@ -58,7 +58,9 @@ class StartupRadarAPI:
         return self._request(f"/web/domains/{domain}/text").json()
 
     def get_links(self, domain):
-        return self._request_paged(f"/web/domains/{domain}/links/domain-links")
+        endpoint = f"/web/domains/{domain}/links/domain-links"
+        return self._request_paged(endpoint)
 
     def get_backlinks(self, domain: str):
-        return self._request_paged(f"/web/domains/{domain}/links/domain-backlinks")
+        endpoint = f"/web/domains/{domain}/links/domain-backlinks"
+        return self._request_paged(endpoint)

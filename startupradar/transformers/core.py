@@ -9,21 +9,6 @@ from sklearn.base import TransformerMixin
 from startupradar.transformers.api import StartupRadarAPI
 
 
-class DomainToDataframeTransformer(TransformerMixin):
-    def __init__(self, api: StartupRadarAPI):
-        self.api = api
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X, y=None):
-        df = pd.DataFrame(X, columns=["domain"])
-        return df
-
-    def get_params(self, deep):
-        return None
-
-
 class ApiTransformer(TransformerMixin):
     def __init__(self, api: StartupRadarAPI):
         self.api = api
