@@ -42,20 +42,31 @@ class LinkTransformer(SeriesTransformer):
     def __init__(self, api):
         super().__init__(api)
         self.columns = None
+        self._domains = None
+
+    def fit(self, X, y=None):
+        super().fit(X, y)
+        self._domains = list({b for a, b in self._fetch_tuples(X)})
+        return self
 
     def transform(self, X, y=None):
         super().transform(X, y)
+        assert self._domains is not None, 'not fitted'
+
         backlinks = self._fetch_tuples(X)
 
-        df = pd.DataFrame(backlinks, columns=["domain", "link"])
-        df["v"] = 1
+        rows = []
+        for domain_given in X:
+            for domain_link in self._domains:
+                rows.append((domain_given, domain_link, int((domain_given, domain_link) in backlinks)))
+
+        df = pd.DataFrame(rows, columns=["domain", "link", 'v'])
 
         df_links = df.pivot(index="domain", columns="link", values="v")
 
         # ensure proper indexing
-        df_links = pd.DataFrame(index=X).join(df_links).fillna(0).astype(int)
+        df_links = pd.DataFrame(index=X).join(df_links).fillna(0).astype(int)[self._domains]
 
-        self.columns = df_links.columns.values
         return df_links
 
     def _fetch_tuples(self, domains):
@@ -69,8 +80,8 @@ class LinkTransformer(SeriesTransformer):
         return self.api.get_links(domain)
 
     def get_feature_names_out(self, feature_names_in=None):
-        # todo use domains of trained columns
-        return self.columns
+        assert self._domains is not None, 'not fitted'
+        return self._domains
 
 
 class BacklinkTransformer(LinkTransformer):
