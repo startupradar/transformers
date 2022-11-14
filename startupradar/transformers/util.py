@@ -2,9 +2,8 @@
 Utility transformers without API-specific functionality.
 """
 import pandas as pd
-from sklearn.base import TransformerMixin
-from sklearn.pipeline import FeatureUnion, Pipeline
 import tldextract
+from sklearn.base import TransformerMixin
 
 
 class DomainNameTransformer(TransformerMixin):
@@ -36,5 +35,3 @@ class ColumnPrefixTransformer(TransformerMixin):
 
     def get_feature_names_out(self, feature_names_in=None):
         return [f"{self.prefix}_{c}" for c in self.columns]
-
-
