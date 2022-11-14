@@ -71,6 +71,9 @@ class StartupRadarAPI:
     def get(self):
         return self._request("/").json()
 
+    def get_domain(self, domain: str):
+        return self._request(f"/web/domains/{domain}")
+
     def get_text(self, domain: str):
         return self._request(f"/web/domains/{domain}/text").json()
 
