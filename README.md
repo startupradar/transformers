@@ -15,15 +15,23 @@ All transformers in this module require API access.
 - BacklinkTransformer: Create columns for all the domains that link to the given domain.
 - DomainTextTransformer: Create a text column with the homepage text of the given domain.
 
+### startupradar.transformers.pandas
+Transformers that also output Pandas DataFrames, can be used by anyone, no API key necessary.
 
-### startupradar.transformers.util
-The transformers in this module don't require the API and can be used by anyone.
-
-- DomainNameTransformer: Extract features from a domain name, currently only top level domain, e.g. 'com' or 'io'.
-- ColumnPrefixTransformer: Create a DataFrame with the same column names, but prefixed with e.g. "prefix_".
 - FeatureUnionDF: Create a FeatureUnion with pd.DataFrames as input and output.
 - PipelineDF: Creates a pipeline that retains DataFrames and their column names
 
+### startupradar.transformers.util
+The transformers in this module also don't require the API and can be used by anyone.
+
+- ColumnPrefixTransformer: Create a DataFrame with the same column names, but prefixed with e.g. "prefix_".
+- DomainNameTransformer: Extract features from a domain name, currently only top level domain, e.g. 'com' or 'io'.
+
+### Upcoming
+Transformers we're thinking about that may be coming soon:
+ 
+- something to leverage the similar domains endpoint
+- tfidf of all backlinks or (forward) links combined (domain- or url-level)
 
 ## How it works
 For most transformers, you can simply pass a series of domain names as input.
