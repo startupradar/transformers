@@ -25,13 +25,24 @@ class StartupRadarAPI:
     Class to use the StartupRadar API.
     """
 
-    def __init__(self, api_key: str):
+    PAGE_LIMIT_DEFAULT = 100
+
+    def __init__(
+        self, api_key: str, page_limit=PAGE_LIMIT_DEFAULT, session_factory=None
+    ):
         self.api_key = api_key
+        self.page_limit = page_limit
+
+        if session_factory:
+            self.session_factory = session_factory
+        else:
+            self.session_factory = lambda: requests
 
     def _request(self, endpoint: str, params: dict = None):
         url = urljoin("https://api.startupradar.co/", endpoint)
         logging.info(f"requesting endpoint ({url=}, {params=})")
-        response = requests.get(url, params, headers={"X-ApiKey": self.api_key})
+        session = self.session_factory()
+        response = session.get(url, params=params, headers={"X-ApiKey": self.api_key})
         if response.status_code == 200:
             return response
         elif response.status_code == 403:
@@ -48,7 +59,9 @@ class StartupRadarAPI:
     def _request_paged(self, endpoint: str):
         results = []
         for page in range(100):
-            response = self._request(endpoint, {"page": page}).json()
+            response = self._request(
+                endpoint, {"page": page, "limit": self.page_limit}
+            ).json()
             results.extend(response)
             if not response:
                 break
