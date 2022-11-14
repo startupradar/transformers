@@ -7,7 +7,7 @@ from collections import Counter
 import pandas as pd
 from sklearn.base import TransformerMixin
 
-from startupradar.transformers.api import StartupRadarAPI
+from startupradar.transformers.api import StartupRadarAPI, NotFoundError
 
 
 class ApiTransformer(TransformerMixin):
@@ -117,10 +117,18 @@ class DomainTextTransformer(SeriesTransformer):
 
     def transform(self, X, y=None):
         super().transform(X, y)
-        return pd.DataFrame(X.apply(self._fetch_text), columns=["text"])
+        assert isinstance(X, pd.Series)
+        series = X.apply(self._fetch_text)
+        df = pd.DataFrame(series)
+        df.columns = ["text"]
+        return df
 
     def _fetch_text(self, domain: str):
-        return self.api.get_text(domain)["html_body_text"]
+        assert isinstance(domain, str), f"domain is not a string, {type(domain)=} given"
+        try:
+            return self.api.get_text(domain)["html_body_text"]
+        except NotFoundError:
+            return ""
 
     def get_feature_names_out(self, feature_names_in=None):
         return ["text"]
