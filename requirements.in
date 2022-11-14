@@ -4,3 +4,4 @@ requests
 black
 tldextract
 flake8
+pytest
