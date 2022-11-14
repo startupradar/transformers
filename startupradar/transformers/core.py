@@ -1,6 +1,7 @@
 """
 Core transformers mapping directly to API functionality.
 """
+import logging
 from abc import ABC
 from collections import Counter
 
@@ -48,25 +49,31 @@ class LinkTransformer(SeriesTransformer):
         self._domains = None
 
     def fit(self, X, y=None):
-        super().fit(X, y)
+        assert isinstance(X, pd.Series)
+
+        domains = X.values.tolist()
 
         # count occurrences
-        counter = Counter((b for a, b in self._fetch_tuples(X)))
+        counter = Counter((b for a, b in self._fetch_tuples(domains)))
 
         # add above threshold
-        self._domains = [
-            domain for domain, count in counter.items() if count >= self.CUTOFF_BELOW
-        ]
+        self._domains = list(
+            {domain for domain, count in counter.items() if count >= self.CUTOFF_BELOW}
+        )
+        if not self._domains:
+            logging.warning("no common links found")
+
         return self
 
     def transform(self, X, y=None):
-        super().transform(X, y)
+        assert isinstance(X, pd.Series)
         assert self._domains is not None, "not fitted"
 
-        backlinks = self._fetch_tuples(X)
+        domains = X.values.tolist()
+        backlinks = self._fetch_tuples(set(domains))
 
         rows = []
-        for domain_given in X:
+        for domain_given in domains:
             for domain_link in self._domains:
                 triple = (
                     domain_given,
@@ -81,9 +88,9 @@ class LinkTransformer(SeriesTransformer):
         df_links = df.pivot(index="domain", columns="link", values="v")
 
         # ensure proper indexing
-        df_links = pd.DataFrame(index=X).join(df_links)[self._domains]
+        df_out = pd.DataFrame(index=X).join(df_links)[self._domains]
 
-        return df_links
+        return df_out
 
     def _fetch_tuples(self, domains):
         tuples = []
