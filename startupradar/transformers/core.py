@@ -3,12 +3,10 @@ Core transformers mapping directly to API functionality.
 """
 import logging
 from abc import ABC
-from collections import Counter, defaultdict
+from collections import Counter
 
 import numpy as np
 import pandas as pd
-import scipy.sparse
-from scipy.sparse import bsr_matrix
 from sklearn.base import TransformerMixin
 
 from startupradar.transformers.api import StartupRadarAPI, NotFoundError

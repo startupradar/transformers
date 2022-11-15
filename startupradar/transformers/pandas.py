@@ -21,9 +21,8 @@ class FeatureUnionDF(TransformerMixin):
         return self
 
     def transform(self, X, y=None, **fit_params):
-        return pd.DataFrame(
-            self.fu.transform(X), columns=self.fu.get_feature_names_out()
-        )
+        out = self.fu.transform(X)
+        return pd.DataFrame(out, columns=self.fu.get_feature_names_out())
 
     def get_feature_names_out(self, feature_names_in=None):
         return self.fu.get_feature_names_out(feature_names_in)
