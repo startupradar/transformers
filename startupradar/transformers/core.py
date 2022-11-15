@@ -3,9 +3,12 @@ Core transformers mapping directly to API functionality.
 """
 import logging
 from abc import ABC
-from collections import Counter
+from collections import Counter, defaultdict
 
+import numpy as np
 import pandas as pd
+import scipy.sparse
+from scipy.sparse import bsr_matrix
 from sklearn.base import TransformerMixin
 
 from startupradar.transformers.api import StartupRadarAPI, NotFoundError
@@ -54,7 +57,7 @@ class LinkTransformer(SeriesTransformer):
         domains = X.values.tolist()
 
         # count occurrences
-        counter = Counter((b for a, b in self._fetch_tuples(domains)))
+        counter = Counter((b for a, b in self._gen_tuples(domains)))
 
         # add above threshold
         self._domains = list(
@@ -70,34 +73,25 @@ class LinkTransformer(SeriesTransformer):
         assert self._domains is not None, "not fitted"
 
         domains = X.values.tolist()
-        backlinks = self._fetch_tuples(set(domains))
 
-        rows = []
-        for domain_given in domains:
-            for domain_link in self._domains:
-                triple = (
-                    domain_given,
-                    domain_link,
-                    # is there a link?
-                    int((domain_given, domain_link) in backlinks),
-                )
-                rows.append(triple)
+        # todo make this work with sparse matrices and columns
+        df = pd.DataFrame(
+            np.zeros([len(domains), len(self._domains)]),
+            index=domains,
+            columns=self._domains,
+            dtype=bool,
+        )
 
-        df = pd.DataFrame(rows, columns=["domain", "link", "v"])
+        for d_from, d_to in self._gen_tuples(set(domains)):
+            if d_to in self._domains:
+                df.at[d_from, d_to] = True
 
-        df_links = df.pivot(index="domain", columns="link", values="v")
+        return df
 
-        # ensure proper indexing
-        df_out = pd.DataFrame(index=X).join(df_links)[self._domains]
-
-        return df_out
-
-    def _fetch_tuples(self, domains):
-        tuples = []
+    def _gen_tuples(self, domains):
         for domain in domains:
             for link in self._fetch_links(domain):
-                tuples.append((domain, link["domain"]))
-        return tuples
+                yield domain, link["domain"]
 
     def _fetch_links(self, domain: str):
         return self.api.get_links(domain)
