@@ -57,3 +57,6 @@ class TfidfVectorizerDF(TransformerMixin):
 
     def set_params(self, **params: dict):
         self.vec.set_params(**params)
+
+    def get_params(self, deep=False):
+        return self.vec.get_params(deep=deep)
