@@ -84,7 +84,8 @@ class StartupRadarAPI:
             )
         else:
             raise StartupRadarAPIError(
-                f"unhandled status code ({response.status_code})"
+                "unhandled status code "
+                f"({response.status_code}, {endpoint=}, {params=})"
             )
 
     def _request_paged(self, endpoint: str):
