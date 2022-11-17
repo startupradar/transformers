@@ -16,6 +16,9 @@ class ApiTransformer(TransformerMixin):
     def __init__(self, api: StartupRadarAPI):
         self.api = api
 
+    def get_params(self, deep):
+        return {"api": self.api}
+
 
 class SeriesTransformer(ApiTransformer, ABC):
     """
@@ -32,9 +35,6 @@ class SeriesTransformer(ApiTransformer, ABC):
         assert isinstance(
             X, pd.Series
         ), "Transformer works on pandas.Series of domains(str)"
-
-    def get_params(self, deep):
-        return None
 
 
 class LinkTransformer(SeriesTransformer):

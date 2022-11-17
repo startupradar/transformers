@@ -54,3 +54,6 @@ class TfidfVectorizerDF(TransformerMixin):
 
     def get_feature_names_out(self, feature_names_in=None):
         return self.vec.get_feature_names_out(input_features=feature_names_in)
+
+    def set_params(self, **params: dict):
+        self.vec.set_params(**params)
