@@ -22,6 +22,10 @@ class ForbiddenError(StartupRadarAPIError):
     pass
 
 
+class NotInCacheError(RuntimeError):
+    pass
+
+
 class APICache:
     """
     Plain caching.
@@ -40,9 +44,12 @@ class APICache:
     def get(self, key):
         path = self._key_to_path(key)
         if not path.is_file():
-            raise RuntimeError("not in cache")
-        with path.open("rb") as file:
-            return pickle.load(file)
+            raise NotInCacheError()
+        try:
+            with path.open("rb") as file:
+                return pickle.load(file)
+        except Exception as e:
+            raise RuntimeError(f"getting cache key failed ({key=})") from e
 
     def put(self, key, value):
         path = self._key_to_path(key)
@@ -115,14 +122,20 @@ class StartupRadarAPI:
     def _request_paged_cached(self, endpoint, params=None):
         assert params is None, "cannot cache params yet"
 
-        if self.cache.has(endpoint):
-            result = self.cache.get(endpoint)
-        else:
-            # do not use cached responses here,
-            # this will lead to mis-matching pages,
-            # e.g. if runs are aborted on page 5/10
-            result = self._request_paged(endpoint)
-            self.cache.put(endpoint, result)
+        try:
+            # early return
+            return self.cache.get(endpoint)
+        except NotInCacheError:
+            pass
+        except Exception:
+            logging.exception("reading cache failed, re-fetching...")
+
+        # do not use cached responses here,
+        # this will lead to mis-matching pages,
+        # e.g. if runs are aborted on page 5/10
+        result = self._request_paged(endpoint)
+        self.cache.put(endpoint, result)
+
         return result
 
     def get_domain(self, domain: str):
