@@ -4,12 +4,14 @@ Classes to access the StartupRadar API.
 import calendar
 import logging
 from datetime import datetime, timedelta
-from email.utils import parsedate, formatdate
+from email.utils import parsedate, formatdate, parsedate_to_datetime
+from itertools import chain
 from urllib.parse import urljoin
 
 import cachecontrol
 import requests
 import tldextract
+from cachecontrol import CacheController
 from cachecontrol.caches import FileCache
 from cachecontrol.heuristics import BaseHeuristic
 
@@ -42,9 +44,11 @@ class InvalidDomainError(StartupRadarAPIWrapperError):
 
 
 class OneWeekHeuristic(BaseHeuristic):
+    TIMEDELTA = timedelta(weeks=1)
+
     def update_headers(self, response):
         date = parsedate(response.headers["date"])
-        expires = datetime(*date[:6]) + timedelta(weeks=1)
+        expires = datetime(*date[:6]) + self.TIMEDELTA
         return {
             "expires": formatdate(calendar.timegm(expires.timetuple())),
             "cache-control": "public",
@@ -55,23 +59,39 @@ class OneWeekHeuristic(BaseHeuristic):
         return '110 - "%s"' % msg
 
 
+class CachesNotFoundController(CacheController):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # hack to also cache 404s without changing anything else
+        if 404 not in self.cacheable_status_codes:
+            self.cacheable_status_codes = self.cacheable_status_codes + (404,)
+
+
 class StartupRadarAPI:
     """
     Class to use the StartupRadar API.
     """
 
     PAGE_LIMIT_DEFAULT = 100
+    MAX_PAGES_DEFAULT = 100
 
     def __init__(
-        self, api_key: str, page_limit=PAGE_LIMIT_DEFAULT, session_factory=None
+        self,
+        api_key: str,
+        page_limit=PAGE_LIMIT_DEFAULT,
+        max_pages=MAX_PAGES_DEFAULT,
+        session_factory=None,
     ):
         self.api_key = api_key
         self.page_limit = page_limit
+        self.max_pages = max_pages
 
         cache_control = cachecontrol.CacheControl(
             requests.Session(),
             cache=FileCache(".cachecontrol"),
             heuristic=OneWeekHeuristic(),
+            controller_class=CachesNotFoundController,
         )
         self.session_factory = lambda: cache_control
         if session_factory:
@@ -79,9 +99,17 @@ class StartupRadarAPI:
 
     def _request(self, endpoint: str, params: dict = None):
         url = urljoin("https://api.startupradar.co/", endpoint)
-        logging.info(f"requesting endpoint ({url=}, {params=})")
+        logging.debug(f"requesting endpoint ({url=}, {params=})")
         session = self.session_factory()
         response = session.get(url, params=params, headers={"X-ApiKey": self.api_key})
+
+        # hack to check if it's a cache miss, i.e. newly fetched
+        expires_date = parsedate_to_datetime(response.headers["expires"])
+        cache_date = expires_date - OneWeekHeuristic.TIMEDELTA
+        age = datetime.utcnow() - cache_date
+        if age < timedelta(seconds=10):
+            logging.info(f"got fresh response ({url=} {params=})")
+
         if response.status_code == 200:
             return response.json()
         elif response.status_code == 403:
@@ -96,15 +124,15 @@ class StartupRadarAPI:
                 f"({response.status_code}, {endpoint=}, {params=})"
             )
 
-    def _request_paged(self, endpoint: str):
-        results = []
-        for page in range(100):
+    def _request_paged(self, endpoint: str, max_pages=MAX_PAGES_DEFAULT):
+        pages = []
+        for page in range(max_pages):
             response = self._request(endpoint, {"page": page, "limit": self.page_limit})
-            results.extend(response)
+            pages.append(response)
             if not response:
                 break
 
-        return results
+        return list(chain(*pages))
 
     def get(self):
         endpoint = "/"
