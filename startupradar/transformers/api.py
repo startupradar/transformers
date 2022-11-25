@@ -1,13 +1,17 @@
 """
 Classes to access the StartupRadar API.
 """
-
+import calendar
 import logging
-import pickle
-from pathlib import Path
-from urllib.parse import urljoin, quote
+from datetime import datetime, timedelta
+from email.utils import parsedate, formatdate
+from urllib.parse import urljoin
 
+import cachecontrol
 import requests
+import tldextract
+from cachecontrol.caches import FileCache
+from cachecontrol.heuristics import BaseHeuristic
 
 
 class StartupRadarAPIError(RuntimeError):
@@ -22,39 +26,26 @@ class ForbiddenError(StartupRadarAPIError):
     pass
 
 
-class NotInCacheError(RuntimeError):
+class StartupRadarAPIWrapperError(RuntimeError):
     pass
 
 
-class APICache:
-    """
-    Plain caching.
-    """
+class InvalidDomainError(StartupRadarAPIWrapperError):
+    pass
 
-    def __init__(self, path=".cache"):
-        self._path = Path(path)
-        self._path.mkdir(parents=True, exist_ok=True)
 
-    def _key_to_path(self, key) -> Path:
-        return self._path.joinpath(quote(key, safe=""))
+class OneWeekHeuristic(BaseHeuristic):
+    def update_headers(self, response):
+        date = parsedate(response.headers["date"])
+        expires = datetime(*date[:6]) + timedelta(weeks=1)
+        return {
+            "expires": formatdate(calendar.timegm(expires.timetuple())),
+            "cache-control": "public",
+        }
 
-    def has(self, key):
-        return self._key_to_path(key).is_file()
-
-    def get(self, key):
-        path = self._key_to_path(key)
-        if not path.is_file():
-            raise NotInCacheError()
-        try:
-            with path.open("rb") as file:
-                return pickle.load(file)
-        except Exception as e:
-            raise RuntimeError(f"getting cache key failed ({key=})") from e
-
-    def put(self, key, value):
-        path = self._key_to_path(key)
-        with path.open("wb") as file:
-            pickle.dump(value, file)
+    def warning(self, response):
+        msg = "Automatically cached! Response is Stale."
+        return '110 - "%s"' % msg
 
 
 class StartupRadarAPI:
@@ -70,11 +61,14 @@ class StartupRadarAPI:
         self.api_key = api_key
         self.page_limit = page_limit
 
-        self.session_factory = requests.session
+        cache_control = cachecontrol.CacheControl(
+            requests.Session(),
+            cache=FileCache(".cachecontrol"),
+            heuristic=OneWeekHeuristic(),
+        )
+        self.session_factory = lambda: cache_control
         if session_factory:
             self.session_factory = session_factory
-
-        self.cache = APICache()
 
     def _request(self, endpoint: str, params: dict = None):
         url = urljoin("https://api.startupradar.co/", endpoint)
@@ -109,47 +103,38 @@ class StartupRadarAPI:
         endpoint = "/"
         return self._request(endpoint)
 
-    def _request_cached(self, endpoint, params=None):
-        assert params is None, "cannot cache params yet"
-
-        if self.cache.has(endpoint):
-            result = self.cache.get(endpoint)
-        else:
-            result = self._request(endpoint)
-            self.cache.put(endpoint, result)
-        return result
-
-    def _request_paged_cached(self, endpoint, params=None):
-        assert params is None, "cannot cache params yet"
-
-        try:
-            # early return
-            return self.cache.get(endpoint)
-        except NotInCacheError:
-            pass
-        except Exception:
-            logging.exception("reading cache failed, re-fetching...")
-
-        # do not use cached responses here,
-        # this will lead to mis-matching pages,
-        # e.g. if runs are aborted on page 5/10
-        result = self._request_paged(endpoint)
-        self.cache.put(endpoint, result)
-
-        return result
-
     def get_domain(self, domain: str):
+        self._ensure_valid_domain(domain)
+
         endpoint = f"/web/domains/{domain}"
-        return self._request_cached(endpoint)
+        return self._request(endpoint)
 
     def get_text(self, domain: str):
+        self._ensure_valid_domain(domain)
+
         endpoint = f"/web/domains/{domain}/text"
-        return self._request_cached(endpoint)
+        return self._request(endpoint)
 
     def get_links(self, domain: str):
+        self._ensure_valid_domain(domain)
+
         endpoint = f"/web/domains/{domain}/links/domain-links"
-        return self._request_paged_cached(endpoint)
+        return self._request_paged(endpoint)
 
     def get_backlinks(self, domain: str):
+        self._ensure_valid_domain(domain)
+
         endpoint = f"/web/domains/{domain}/links/domain-backlinks"
-        return self._request_paged_cached(endpoint)
+        return self._request_paged(endpoint)
+
+    def _ensure_valid_domain(self, domain: str):
+        if domain != domain.strip():
+            raise InvalidDomainError(f"domain contains spaces ({domain=})")
+
+        if not domain:
+            raise InvalidDomainError(f"domain is falsy ({domain=})")
+
+        extraction = tldextract.extract("http://" + domain)
+        domain_actual = extraction.registered_domain
+        if domain_actual != domain:
+            raise InvalidDomainError(f"domain is invalid ({domain=}, {domain_actual=})")

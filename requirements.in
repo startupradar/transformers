@@ -1,7 +1,0 @@
-pandas
-scikit-learn
-requests
-black
-tldextract
-flake8
-pytest
