@@ -128,11 +128,11 @@ class StartupRadarAPI:
         return self._request_paged(endpoint)
 
     def _ensure_valid_domain(self, domain: str):
-        if domain != domain.strip():
-            raise InvalidDomainError(f"domain contains spaces ({domain=})")
-
         if not domain:
             raise InvalidDomainError(f"domain is falsy ({domain=})")
+
+        if domain != domain.strip():
+            raise InvalidDomainError(f"domain contains spaces ({domain=})")
 
         extraction = tldextract.extract("http://" + domain)
         domain_actual = extraction.registered_domain
