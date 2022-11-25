@@ -5,17 +5,31 @@ import pandas as pd
 import tldextract
 from sklearn.base import TransformerMixin
 
+from startupradar.transformers.api import InvalidDomainError
+
 
 class DomainNameTransformer(TransformerMixin):
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
-        tlds = [tldextract.extract("http://" + domain).suffix for domain in X]
-        return pd.DataFrame(tlds, index=X, columns=["tld"])
+        tlds = [tldextract.extract("http://" + domain) for domain in X]
+        df = pd.DataFrame(tlds, index=X)
+
+        # check inputs
+        for row, domain_input in zip(df.to_dict(orient="records"), X):
+            domain_parsed = ".".join([row["domain"], row["suffix"]])
+            if domain_parsed != domain_input:
+                raise InvalidDomainError(
+                    f"parsed domain looks off: {domain_parsed=}, {domain_input=}"
+                )
+
+        # create lengths
+        df["length"] = df["domain"].apply(len)
+        return df[["suffix", "length"]]
 
     def get_feature_names_out(self, feature_names_in=None):
-        return ["tld"]
+        return ["suffix", "length"]
 
 
 class ColumnPrefixTransformer(TransformerMixin):
