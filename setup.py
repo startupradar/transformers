@@ -12,6 +12,7 @@ setup(
         "tldextract",
         "flake8",
         "pytest",
+        "numpy",
         "cachecontrol[filecache]",
     ],
 )
