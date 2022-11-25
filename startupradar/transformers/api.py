@@ -13,6 +13,13 @@ import tldextract
 from cachecontrol.caches import FileCache
 from cachecontrol.heuristics import BaseHeuristic
 
+DOMAINS_IGNORED_BACKLINKS = (
+    "facebook.com",
+    "twitter.com",
+    "instagram.com",
+    "linkedin.com",
+)
+
 
 class StartupRadarAPIError(RuntimeError):
     pass
@@ -123,6 +130,15 @@ class StartupRadarAPI:
 
     def get_backlinks(self, domain: str):
         self._ensure_valid_domain(domain)
+
+        if domain in DOMAINS_IGNORED_BACKLINKS:
+            msg = (
+                "domain is in ignored domains "
+                "because it would return too many backlinks"
+                "returning empty backlinks instead {domain=}"
+            )
+            logging.warning(msg)
+            return []
 
         endpoint = f"/web/domains/{domain}/links/domain-backlinks"
         return self._request_paged(endpoint)
