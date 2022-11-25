@@ -6,6 +6,7 @@ import tldextract
 from sklearn.base import TransformerMixin
 
 from startupradar.transformers.api import InvalidDomainError
+from startupradar.transformers.pandas import CountVectorizerDF
 
 
 class DomainNameTransformer(TransformerMixin):
@@ -49,3 +50,26 @@ class ColumnPrefixTransformer(TransformerMixin):
 
     def get_feature_names_out(self, feature_names_in=None):
         return [f"{self.prefix}_{c}" for c in self.columns]
+
+
+class CommonStringTransformer(TransformerMixin):
+    """
+    Computes common strings from passed data.
+    Internally, this uses the CountVectorizer from scikit-learn.
+    """
+
+    def __init__(self, **kwargs):
+        self.vec = CountVectorizerDF(
+            analyzer="char",
+            **kwargs,
+        )
+
+    def fit(self, X, y=None):
+        self.vec.fit(X, y)
+        return self
+
+    def transform(self, X):
+        return self.vec.transform(X)
+
+    def get_feature_names_out(self, feature_names_in=None):
+        return self.vec.get_feature_names_out(feature_names_in)

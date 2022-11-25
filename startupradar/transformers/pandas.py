@@ -3,7 +3,7 @@ sklearn transformers adapted to work on pandas DataFrames or Series'.
 """
 import pandas as pd
 from sklearn.base import TransformerMixin
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.pipeline import FeatureUnion, Pipeline
 
 
@@ -39,9 +39,12 @@ class PipelineDF(Pipeline):
         return self.steps[-1][1].get_feature_names_out(feature_names_in)
 
 
-class TfidfVectorizerDF(TransformerMixin):
-    def __init__(self, **kwargs):
-        self.vec = TfidfVectorizer(**kwargs)
+class Vectorizer(TransformerMixin):
+    """
+    Vectorizer leveraging composition of an sklearn vectorizer to produce dataframe outputs.
+    """
+
+    vec = None
 
     def fit(self, docs, y=None):
         self.vec.fit(docs, y)
@@ -60,3 +63,13 @@ class TfidfVectorizerDF(TransformerMixin):
 
     def get_params(self, deep=False):
         return self.vec.get_params(deep=deep)
+
+
+class TfidfVectorizerDF(Vectorizer):
+    def __init__(self, **kwargs):
+        self.vec = TfidfVectorizer(**kwargs)
+
+
+class CountVectorizerDF(Vectorizer):
+    def __init__(self, **kwargs):
+        self.vec = CountVectorizer(**kwargs)
