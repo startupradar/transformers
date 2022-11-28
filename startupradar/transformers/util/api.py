@@ -171,6 +171,12 @@ class StartupRadarAPI:
         endpoint = f"/web/domains/{domain}/links/domain-backlinks"
         return self._request_paged(endpoint)
 
+    def get_similar(self, domain: str):
+        self._ensure_valid_domain(domain)
+
+        endpoint = f"/web/domains/{domain}/similar"
+        return self._request(endpoint)
+
     def _ensure_valid_domain(self, domain: str):
         if not domain:
             raise InvalidDomainError(f"domain is falsy ({domain=})")
