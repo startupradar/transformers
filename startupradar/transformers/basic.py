@@ -5,7 +5,7 @@ import pandas as pd
 import tldextract
 from sklearn.base import TransformerMixin
 
-from startupradar.transformers.api import InvalidDomainError
+from startupradar.transformers.util.api import InvalidDomainError
 from startupradar.transformers.pandas import CountVectorizerDF
 
 
