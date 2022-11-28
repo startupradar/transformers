@@ -59,3 +59,13 @@ startupradar.co     co
 karllorey.com      com
 
 ```
+
+## Install
+This is a work in progress.
+You should expect things to change on a daily basis.
+If you're still convinced to try it,
+feel free to check the latest version by installing it as a git-based dependency:
+
+```shell
+> pip install git+https://github.com/startupradar/transformers.git
+```
