@@ -15,32 +15,19 @@ from cachecontrol import CacheController
 from cachecontrol.caches import FileCache
 from cachecontrol.heuristics import BaseHeuristic
 
+from startupradar.transformers.util.exceptions import (
+    StartupRadarAPIError,
+    NotFoundError,
+    ForbiddenError,
+    InvalidDomainError,
+)
+
 DOMAINS_IGNORED_BACKLINKS = (
     "facebook.com",
     "twitter.com",
     "instagram.com",
     "linkedin.com",
 )
-
-
-class StartupRadarAPIError(RuntimeError):
-    pass
-
-
-class NotFoundError(StartupRadarAPIError):
-    pass
-
-
-class ForbiddenError(StartupRadarAPIError):
-    pass
-
-
-class StartupRadarAPIWrapperError(RuntimeError):
-    pass
-
-
-class InvalidDomainError(StartupRadarAPIWrapperError):
-    pass
 
 
 class OneWeekHeuristic(BaseHeuristic):

@@ -1,6 +1,6 @@
 import pytest
 
-from startupradar.transformers.util.api import InvalidDomainError
+from startupradar.transformers.util.exceptions import InvalidDomainError
 from startupradar.transformers.basic import (
     DomainNameTransformer,
     CommonStringTransformer,

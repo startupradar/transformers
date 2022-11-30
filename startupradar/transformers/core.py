@@ -9,7 +9,8 @@ import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin
 
-from startupradar.transformers.util.api import StartupRadarAPI, NotFoundError
+from startupradar.transformers.util.api import StartupRadarAPI
+from startupradar.transformers.util.exceptions import NotFoundError
 
 
 class ApiTransformer(TransformerMixin):
