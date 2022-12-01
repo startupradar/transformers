@@ -169,6 +169,9 @@ class StartupRadarAPI:
         endpoint = f"/web/domains/{domain}/socials"
         return self._request(endpoint)
 
+    def get_sources(self):
+        return self._request("/sources")
+
     def _ensure_valid_domain(self, domain: str):
         if not domain:
             raise InvalidDomainError(f"domain is falsy ({domain=})")
