@@ -14,6 +14,7 @@ import tldextract
 from cachecontrol import CacheController
 from cachecontrol.caches import FileCache
 from cachecontrol.heuristics import BaseHeuristic
+from requests.adapters import HTTPAdapter
 
 from startupradar.transformers.util.exceptions import (
     StartupRadarAPIError,
@@ -84,6 +85,21 @@ class StartupRadarAPI:
         if session_factory:
             self.session_factory = session_factory
 
+    @property
+    def is_cached(self):
+        adapter = self.session_factory().get_adapter("https://")
+        is_cached_adapter = isinstance(
+            adapter, cachecontrol.adapter.CacheControlAdapter
+        )
+        is_regular_adapter = isinstance(adapter, HTTPAdapter)
+        if not is_cached_adapter and not is_regular_adapter:
+            logging.warning(
+                "unknown cache adapter used, "
+                f"caching detection not working ({adapter=})"
+            )
+
+        return is_cached_adapter
+
     def _request(self, endpoint: str, params: dict = None):
         url = urljoin("https://api.startupradar.co/", endpoint)
         logging.debug(f"requesting endpoint ({url=}, {params=})")
@@ -91,11 +107,12 @@ class StartupRadarAPI:
         response = session.get(url, params=params, headers={"X-ApiKey": self.api_key})
 
         # hack to check if it's a cache miss, i.e. newly fetched
-        expires_date = parsedate_to_datetime(response.headers["expires"])
-        cache_date = expires_date - OneWeekHeuristic.TIMEDELTA
-        age = datetime.utcnow() - cache_date
-        if age < timedelta(seconds=10):
-            logging.info(f"got fresh response ({url=} {params=})")
+        if "expires" in response.headers:
+            expires_date = parsedate_to_datetime(response.headers["expires"])
+            cache_date = expires_date - OneWeekHeuristic.TIMEDELTA
+            age = datetime.utcnow() - cache_date
+            if age < timedelta(seconds=10):
+                logging.info(f"got fresh response ({url=} {params=})")
 
         if response.status_code == 200:
             return response.json()
