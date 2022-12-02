@@ -31,7 +31,7 @@ def tqdm_if_installed(iterable, total=None):
     try:
         import tqdm
 
-        yield from tqdm(iterable, total=total)
+        yield from tqdm.tqdm(iterable, total=total)
     except ModuleNotFoundError:
         yield from iterable
 
