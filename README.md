@@ -8,6 +8,9 @@ filled with all the data available on [StartupRadar](https://startupradar.co).
 
 ## Implemented transformers
 
+### startupradar.transformers.export
+- Creates a human-readable DataFrame for usage in Excel or Google Spreadsheets (through CSV).
+
 ### startupradar.transformers.core
 Transformers in this module create data from API functionality. 
 All transformers in this module require API access.
@@ -33,7 +36,6 @@ These transformers can be used by anyone, no API key necessary.
 - `PipelineDF`: Creates a pipeline that retains DataFrames and their column names
 - `TfidfVectorizerDF`: Adaption of the sklearn transformer
 - `CountVectorizerDF`: Adaption of the sklearn transformer
-
 
 ### Upcoming
 Transformers we're thinking about that may be coming soon:

@@ -1,0 +1,257 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+      X-ApiKey:
+      - hahaha
+    method: GET
+    uri: https://api.startupradar.co/web/domains/startupradar.co/text
+  response:
+    body:
+      string: "{\"html_title\":\"Startup Radar: Find startups, investors, accelerators\",\"html_language\":null,\"html_body_text\":\"Startup
+        Radar: Find startups, investors, accelerators Startup Radar: Find startups,
+        investors, accelerators API Startup Discovery Sign up An API to find startups
+        earlier than everyone else Discover new startups earlier with our API tracking
+        the European startup ecosystem. We track what's happening for you. You fetch
+        the data you need and become data-driven without building enormous data pipelines
+        yourself. Monitoring of 850+ websites and startup platforms Documented and
+        unlimited REST API Request API key Check API docs Data is Venture Capital's
+        ultimate competitive advantage Investors that systematically leverage data
+        are outperforming all others. Earlybird \u201CData-driven sourcing and intelligent
+        screening will allow VCs to identify the most promising entrepreneurs more
+        efficiently and more effectively, at the right point in time, and wherever
+        they are. Geography and \u201Cwarm intros\u201D will eventually become irrelevant.\u201D
+        - source Signalfire \u201CBeacon tracks the performance of more than 6 million
+        companies in real-time by drawing upon 10milion data sources, such as academic
+        publications, patent registries, open-source contributions, regulatory filings,
+        company webpages, sales data, appstore rankings, social networks, and even
+        raw credit card data.\u201D - source EQT Motherbrain \u201CFirms that can
+        systematically capture and leverage data, not only external and performance
+        data, but also human predictions, judgements and decisions, will be well positioned
+        to achieve a future competitive advantage. We started this years ago, and
+        we\u2019re not slowing down.\u201D - source Three steps to data-driven dealflow
+        with our API We track everything for you. You integrate it into your workflow.
+        1 We monitor the European startup ecosystem for you To find the hottest new
+        startups, we track every source where a startup could appear across the European
+        startup ecosystem. see recent discoveries > 2 We provide our data through
+        a simple and easy-to-use REST API Our data can be accessed with a simple API.
+        It always contains the latest data. Check out the documentation to see all
+        functionality. check the docs > 3 You integrate our data and apply your expertise
+        to select the best deals Due to the versatile REST API, you can integrate
+        the StartupRadar API however you like. Just fetch the data and push it into
+        your own systems. Since no data is fed back into our systems, your insights,
+        algorithms, and expertise stay in-house. discover use cases > What we track
+        We're not pitching you to become data-driven without showing you the actual
+        numbers. Well, here they are. 46 Startup platforms 254 Ecosystem players 114
+        Accelerators and Incubators 38 News and media 33 Events 399 Early-stage investors
+        61 Universities 43 Research Institutes 11 Grants & Support programs Use Cases
+        This is a selection of use cases you can implement with our API. Monitor accelerators
+        and incubators An accelerator listed a new startup on their website? Get a
+        heads-up straight to your inbox. Learn more > Automatically approach startups
+        Want to save the hassle of approach teams individually? Just generate leads
+        and get a first call. Learn more > Find startups' competitors faster When
+        checking a lead, see similar startups the the same ecosystem or globally to
+        make sure to not miss any competitor. Learn more > See what others are investing
+        in Stay up to date on what topics or startups your fellow investors are investing
+        in. Learn more > Push Dealflow to your CRM automatically Integrate your Magic
+        Sauce with StartupRadar and push new startups directly into your CRM system.
+        Learn more > Discover relevant ecosystem players Keeping an ecosystem overview
+        is very time consuming. Get new ecosystem players straight to your inbox or
+        CRM. Learn more > Detect relaunches and pivots Better re-evaluate deals after
+        they pivot. Get notified for every lead or every portfolio company that pivots.
+        Learn more > Get notified of press coverage Your deal is getting press? You
+        should know! Get a notification for every lead that gets mentioned in the
+        press. Learn more > Seven reasons for StartupRadar Ambitious investors leverage
+        StartupRadar to 10x their efficiency when sourcing startups. Not another platform:
+        bring your own workflow We offer a simple, well-documented REST-API you can
+        use however you like. No need to use some sophisticated SaaS tool. No need
+        to share your data with anyone. Just integrate it into your current stack.
+        Building own scrapers is expensive and inefficient The most successful funds
+        are using technology to become data driven. But building sophisticated technology
+        with 2% management fee is hard. We build scrapers and intelligence for you,
+        so you can focus on making the best deals and supporting your portfolio. Act
+        and decide on data, don't search for it You can only screen a limited number
+        of sources every few weeks. Our scrapers check 850+ sources and 100k pages
+        daily. With our API, you can fetch the newest discoveries instantly and don't
+        lose access by being too late. Startup Platforms and Company Registers are
+        too late After three years of building an early-stage fund from scratch, one
+        thing was obvious to us: when startups appear at company registers or startup
+        platforms, it's already too late. At this point, you've lost your edge to
+        get into a hot deal early. Don't re-invent the wheel, leverage our expertise
+        instead We've been building crawlers and scrapers for the last ten years and
+        technology for investors for more than five years. Don't waste time duplicating
+        that effort and use our data instead. Save the time, budget, and maintenance
+        efforts. Keep expertise in-house You leverage our data, but don't need to
+        feed data back. This way, your expertise and algorithms stay inhouse and you
+        don't give away your competitive advantage when sourcing the best deals. Don't
+        pay for a platform you don't need Competitors require you to use a platform
+        you don't need. And you always give away important insights to them. Which
+        deals you look at and even how you rate startups. We just provide an API,
+        no UI, no tracking, just data. Integrates with the tools investors love With
+        our flexible API, we can integrate with almost every solution on the market.
+        Affinity CRM Create and enrich deals automatically. Salesforce CRM Create
+        and enrich leads automatically. Hubspot CRM Create and enrich deals/companies
+        automatically. Pipedrive CRM Create and enrich leads/deals automatically.
+        Attio CRM Push leads from StartupRadar directly into your funnel. Dealroom
+        Data Provider Link dealroom companies with StartupRadar entries. Crunchbase
+        Data Provider Link Crunchbase companies with StartupRadar entries. Pitchbook
+        Data Provider Link Pitchbook companies with StartupRadar entries. Airtable
+        Other Push rows to databases automatically. Zapier Integration Whatever you
+        imagine, with Zapier, it can be built. Ranging from email to Google Sheets.
+        Bubble No Code Integrate our API into your no-code solution from bubble. Slack
+        Messaging Push new startups directly into one Slack channel. Trello Project
+        Management Create cards on boards automatically. Asana Project Management
+        Create a new tasks for each new startups. Calendly Other Send invites to founders
+        via email. cal.com Other Send invites to founders via email. Webhooks Integration
+        Push new startups directly into your systems. and many more... StartupRadar
+        Discover startups, investors, and accelerators in Europe with one API Powered
+        by apistemic . Built with \u2764 in Berlin by Karl Lorey . \xA9 2022, Lorey
+        Ventures . Legal | Privacy Policy Recent Discoveries coming soon all discoveries
+        university and academia accelerators investors regional startup ecosystems
+        press and news Curated Lists coming soon Data for Venture Capital Data-driven
+        VC funds Hot Startups from Southwest Germany PionierGarage Alumni Startups
+        Rankings coming soon Universities in Germany Accelerators in Germany Early-Stage
+        Investors in Germany\",\"html_meta_description\":\"Discover new startups by
+        tracking the European startup ecosystem with one API focused on finding early-stage
+        startups.\"}"
+    headers:
+      Content-Length:
+      - '8149'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 02 Dec 2022 21:17:56 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+      X-ApiKey:
+      - hahaha
+    method: GET
+    uri: https://api.startupradar.co/web/domains/startupradar.co/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 02 Dec 2022 21:17:56 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+      X-ApiKey:
+      - hahaha
+    method: GET
+    uri: https://api.startupradar.co/sources
+  response:
+    body:
+      string: "[]"
+    headers:
+      Content-Length:
+      - '118466'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 02 Dec 2022 21:17:56 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+      X-ApiKey:
+      - hahaha
+    method: GET
+    uri: https://api.startupradar.co/web/domains/startupradar.co/links/domain-backlinks?page=0&limit=100
+  response:
+    body:
+      string: '[{"domain":"loreyventures.com","type":"unknown","logo_url":"https://logo.clearbit.com/loreyventures.com"},{"domain":"producthunt.com","type":"irrelevant","logo_url":"https://logo.clearbit.com/producthunt.com"}]'
+    headers:
+      Content-Length:
+      - '210'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 02 Dec 2022 21:17:57 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+      X-ApiKey:
+      - hahaha
+    method: GET
+    uri: https://api.startupradar.co/web/domains/startupradar.co/links/domain-backlinks?page=1&limit=100
+  response:
+    body:
+      string: '[]'
+    headers:
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 02 Dec 2022 21:17:57 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+version: 1
