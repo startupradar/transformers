@@ -21,6 +21,7 @@ def test_domain_input_cleaner_raw_domain(api):
     assert result == ["karllorey.com"]
 
 
+@pytest.mark.vcr
 def test_domain_input_cleaner_redirect(api):
     url = "http://pointnine.vc"
 
