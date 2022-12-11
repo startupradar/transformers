@@ -132,8 +132,12 @@ class StartupRadarAPI:
         pages = []
         for page in range(max_pages):
             response = self._request(endpoint, {"page": page, "limit": self.page_limit})
+
+            # add results to pages
             pages.append(response)
-            if not response:
+
+            if len(response) < self.page_limit:
+                # less results than limit -> last page
                 break
 
         return list(chain(*pages))
