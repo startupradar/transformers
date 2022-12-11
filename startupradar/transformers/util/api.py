@@ -171,7 +171,7 @@ class StartupRadarAPI:
             msg = (
                 "domain is in ignored domains "
                 "because it would return too many backlinks"
-                "returning empty backlinks instead {domain=}"
+                f"returning empty backlinks instead {domain=}"
             )
             logging.warning(msg)
             return []
