@@ -79,7 +79,7 @@ class CountVectorizerDF(Vectorizer):
 
 class OneHotEncoderDF(TransformerMixin):
     def __init__(self, **kwargs):
-        kwargs["sparse"] = False
+        kwargs["sparse_output"] = False
         self.enc = OneHotEncoder(**kwargs)
 
     def fit(self, X: pd.DataFrame, y=None):

@@ -6,7 +6,7 @@ setup(
     packages=find_namespace_packages(include=["startupradar.*"]),
     install_requires=[
         "pandas",
-        "scikit-learn",
+        "scikit-learn>=1.2",
         "requests",
         "tldextract",
         "numpy",
