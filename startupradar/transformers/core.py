@@ -43,12 +43,10 @@ class LinkTransformer(SeriesTransformer):
     Creates columns for all domains the given domain links to.
     """
 
-    CUTOFF_BELOW = 2
-
-    def __init__(self, api):
+    def __init__(self, api, n: int = 10):
         super().__init__(api)
-        self.columns = None
         self._domains = None
+        self.n = n
 
     def fit(self, X, y=None):
         assert isinstance(X, pd.Series)
@@ -58,10 +56,9 @@ class LinkTransformer(SeriesTransformer):
         # count occurrences
         counter = Counter((b for a, b in self._gen_tuples(domains)))
 
-        # add above threshold
-        self._domains = list(
-            {domain for domain, count in counter.items() if count >= self.CUTOFF_BELOW}
-        )
+        # add top n
+        self._domains = [domain for domain, count in counter.most_common(self.n)]
+
         if not self._domains:
             logging.warning("no common links found")
 
