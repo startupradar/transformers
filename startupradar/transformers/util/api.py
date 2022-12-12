@@ -59,6 +59,20 @@ class CachesNotFoundController(CacheController):
             self.cacheable_status_codes = self.cacheable_status_codes + (404,)
 
 
+class CacheControlSessionFactory:
+    def __init__(self, path: str, heuristic):
+        self.path = path
+        self.heuristic = heuristic
+
+    def get(self):
+        return cachecontrol.CacheControl(
+            requests.Session(),
+            cache=FileCache(self.path),
+            heuristic=self.heuristic,
+            controller_class=CachesNotFoundController,
+        )
+
+
 class StartupRadarAPI:
     """
     Class to use the StartupRadar API.
@@ -78,13 +92,8 @@ class StartupRadarAPI:
         self.page_limit = page_limit
         self.max_pages = max_pages
 
-        cache_control = cachecontrol.CacheControl(
-            requests.Session(),
-            cache=FileCache(".cachecontrol"),
-            heuristic=OneWeekHeuristic(),
-            controller_class=CachesNotFoundController,
-        )
-        self.session_factory = lambda: cache_control
+        factory = CacheControlSessionFactory(".cachecontrol", OneWeekHeuristic())
+        self.session_factory = factory.get
         if session_factory:
             self.session_factory = session_factory
 
