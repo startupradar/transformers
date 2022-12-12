@@ -29,6 +29,8 @@ DOMAINS_IGNORED_BACKLINKS = (
     "twitter.com",
     "instagram.com",
     "linkedin.com",
+    "youtube.com",
+    "apple.com",
 )
 
 
