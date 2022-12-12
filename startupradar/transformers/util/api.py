@@ -24,6 +24,7 @@ from startupradar.transformers.util.exceptions import (
 )
 
 DOMAINS_IGNORED_BACKLINKS = (
+    "google.com",
     "facebook.com",
     "twitter.com",
     "instagram.com",
