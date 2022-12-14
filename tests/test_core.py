@@ -1,42 +1,10 @@
-from unittest.mock import Mock
-
 import pandas as pd
-import pytest
 
-from startupradar.transformers.core import LinkTransformer, BacklinkTransformer
-
-
-def domain_to_dict(domain: str):
-    return {"domain": domain}
-
-
-DOMAIN_HYPERLINKS = [
-    ("karllorey.com", "google.com"),
-    ("karllorey.com", "crunchbase.com"),
-    ("startupradar.co", "google.com"),
-    ("startupradar.co", "crunchbase.com"),
-    ("startupradar.co", "pitchbook.com"),
-    ("crunchbase.com", "google.com"),
-    ("irrelevant.com", "google.com"),
-]
-
-
-@pytest.fixture
-def mock_api():
-    mock_api = Mock()
-
-    mock_domains = ["karllorey.com", "startupradar.co"]
-    mock_api.get_domains = [domain_to_dict(d) for d in mock_domains]
-
-    mock_api.get_links = lambda d: [
-        domain_to_dict(d_to) for d_from, d_to in DOMAIN_HYPERLINKS if d_from == d
-    ]
-
-    mock_api.get_backlinks = lambda d: [
-        domain_to_dict(d_from) for d_from, d_to in DOMAIN_HYPERLINKS if d_to == d
-    ]
-
-    return mock_api
+from startupradar.transformers.core import (
+    LinkTransformer,
+    BacklinkTransformer,
+    BacklinkTypeCounter,
+)
 
 
 def test_link_transformer(mock_api):
@@ -65,3 +33,12 @@ def test_backlink_transformer(mock_api):
     assert df.columns.tolist() == ["startupradar.co", "karllorey.com"]
     assert df["startupradar.co"].tolist() == [True, True]
     assert df["karllorey.com"].tolist() == [True, False]
+
+
+def test_link_type_counter(mock_api):
+    t = BacklinkTypeCounter(mock_api)
+    t.fit(["google.com"])
+    out = t.transform(["google.com"])
+    assert out["person"].tolist() == [1]
+    assert out["platform"].tolist() == [1]
+    assert out["unknown"].tolist() == [2]

@@ -18,6 +18,7 @@ All transformers in this module require API access.
 - `LinkTransformer`: Create columns for all the domains a given domain links to
 - `BacklinkTransformer`: Create columns for all the domains that link to the given domain
 - `DomainTextTransformer`: Create a text column with the homepage text of the given domain
+- `BacklinkTypeCounter`: Counts the types of pages that link to a specific domain
 
 ### startupradar.transformers.basic
 Transformers in this module work with DataFrames and provide useful feature generation on domains.
@@ -26,6 +27,7 @@ The transformers in this module don't require the API and can be used by anyone.
 - `DomainNameTransformer`: Extract features from a domain name, currently only top level domain, e.g. `com` or `io`
 - `CommonStringTransformer`: Application of a `CountVectorizer` to find common strings among passed inputs
 - `ColumnPrefixTransformer`: Create a DataFrame with the same column names, but prefixed with e.g. `prefix_`
+- `CounterTransformer`: Create row-wise Counter objects and distribute keys as columns
 
 ### startupradar.transformers.pandas
 Transformers that re-implement scikit-learn transformers, to also output Pandas DataFrames.

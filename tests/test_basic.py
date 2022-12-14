@@ -1,14 +1,13 @@
 from collections import Counter
 
-import pandas as pd
 import pytest
 
-from startupradar.transformers.util.exceptions import InvalidDomainError
 from startupradar.transformers.basic import (
     DomainNameTransformer,
     CommonStringTransformer,
     CounterTransformer,
 )
+from startupradar.transformers.util.exceptions import InvalidDomainError
 
 DOMAINS_INVALID = [
     "127.0.0.1",

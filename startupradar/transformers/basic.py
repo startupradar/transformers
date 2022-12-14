@@ -89,7 +89,7 @@ class CounterTransformer(TransformerMixin, ABC):
 
     def fit(self, X, y=None):
         df = self.make_counter_df(X)
-        self.keys = list(
+        self.keys = sorted(
             set(itertools.chain(*[c.keys() for c in df["counter"].values]))
         )
         return self
@@ -106,8 +106,11 @@ class CounterTransformer(TransformerMixin, ABC):
         df["counter"] = df.index.to_series().apply(self.create_counter)
         return df
 
-    def create_counter(self, x) -> Counter:
+    def create_counter(self, domain: str) -> Counter:
         """
         This method should return a counter for each passed element x in X.
         """
         raise NotImplementedError()
+
+    def get_feature_names_out(self, feature_names_in=None):
+        return self.keys

@@ -3,12 +3,12 @@ Classes used to export human-readable data.
 """
 import logging
 import typing
-from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 
 import pandas as pd
 
+from startupradar.transformers.core import BacklinkTypeCounter
 from startupradar.transformers.util.api import StartupRadarAPI
 from startupradar.transformers.util.exceptions import NotFoundError
 
@@ -94,32 +94,9 @@ class DomainExport:
         return df_full
 
     def make_df_backlinks(self, domains):
-        self._warm_cache(self.api.get_backlinks, domains)
-
-        domain_to_sourcetype = {
-            s["domain"]: s["category"] for s in self.api.get_sources()
-        }
-        df_backlinks = pd.DataFrame(index=domains)
-        backlinks_per_domain = [
-            set(map(lambda b: b["domain"], self.api.get_backlinks(d))) for d in domains
-        ]
-        backlinks_counter_per_domains = [
-            Counter(map(lambda d: domain_to_sourcetype.get(d), backlinks))
-            for backlinks in backlinks_per_domain
-        ]
-        df_backlinks["backlinks_all"] = pd.Series(
-            [len(b) for b in backlinks_per_domain], index=domains
-        )
-        for col, category in {
-            "investors": "Investors",
-            "academia": "Academia",
-            "accelerators": "Accelerators",
-            "news": "News",
-        }.items():
-            df_backlinks[f"backlinks_{col}"] = pd.Series(
-                [c.get(category) or 0 for c in backlinks_counter_per_domains],
-                index=domains,
-            )
+        t = BacklinkTypeCounter(self.api)
+        df_backlinks = t.fit_transform(domains)
+        df_backlinks.columns = [f"backlinks_{c}" for c in df_backlinks.columns]
         return df_backlinks
 
     def _get_meta_description_capped(self, domain: str):

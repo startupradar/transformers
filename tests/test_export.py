@@ -4,17 +4,14 @@ from startupradar.transformers.export import DomainExport
 
 
 @pytest.mark.vcr
-def test_export(api):
-    exporter = DomainExport(api)
+def test_export(mock_api):
+    exporter = DomainExport(mock_api)
 
-    input_domains = ["startupradar.co"]
+    input_domains = ["startupradar.co", "crunchbase.com"]
     df = exporter.create_for_domains(input_domains)
     print(df.to_string())
 
     assert len(df) == len(input_domains)
-
-    row = df.loc["startupradar.co"]
-    print(row)
 
     # check layout
     assert df.columns.values.tolist() == [
@@ -26,18 +23,11 @@ def test_export(api):
         "crunchbase_url",
         "instagram_url",
         "email",
-        "backlinks_all",
-        "backlinks_investors",
-        "backlinks_academia",
-        "backlinks_accelerators",
-        "backlinks_news",
+        "backlinks_person",
+        "backlinks_unknown",
     ]
 
     # check columns
+    row = df.loc["startupradar.co"]
     assert row["url"] == "https://startupradar.co"
-
-    assert row["backlinks_all"] == 2
-    assert row["backlinks_investors"] == 0
-    assert row["backlinks_academia"] == 0
-    assert row["backlinks_accelerators"] == 0
-    assert row["backlinks_news"] == 0
+    assert row["backlinks_unknown"] == 0

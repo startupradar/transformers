@@ -4,13 +4,17 @@ Core transformers mapping directly to API functionality.
 import logging
 from abc import ABC
 from collections import Counter
+from functools import cached_property, lru_cache
 
 import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin
 
+from startupradar.transformers.basic import CounterTransformer
 from startupradar.transformers.util.api import StartupRadarAPI
 from startupradar.transformers.util.exceptions import NotFoundError
+
+N_DEFAULT = 10
 
 
 class ApiTransformer(TransformerMixin):
@@ -43,7 +47,7 @@ class LinkTransformer(SeriesTransformer):
     Creates columns for all domains the given domain links to.
     """
 
-    def __init__(self, api, n: int = 10):
+    def __init__(self, api, n: int = N_DEFAULT):
         super().__init__(api)
         self._domains = None
         self.n = n
@@ -129,3 +133,21 @@ class DomainTextTransformer(SeriesTransformer):
 
     def get_feature_names_out(self, feature_names_in=None):
         return ["text"]
+
+
+class BacklinkTypeCounter(CounterTransformer):
+    def __init__(self, api: StartupRadarAPI):
+        super().__init__()
+        self.api = api
+
+    def create_counter(self, domain: str) -> Counter:
+        links = self.api.get_backlinks(domain)
+        return Counter([self.get_type(link["domain"]) for link in links])
+
+    @lru_cache
+    def get_type(self, domain):
+        return self.type_per_domain.get(domain, "unknown")
+
+    @cached_property
+    def type_per_domain(self) -> dict:
+        return {s["domain"]: s["category"] for s in self.api.get_sources()}
