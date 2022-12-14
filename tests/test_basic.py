@@ -1,9 +1,13 @@
+from collections import Counter
+
+import pandas as pd
 import pytest
 
 from startupradar.transformers.util.exceptions import InvalidDomainError
 from startupradar.transformers.basic import (
     DomainNameTransformer,
     CommonStringTransformer,
+    CounterTransformer,
 )
 
 DOMAINS_INVALID = [
@@ -47,3 +51,17 @@ def test_common_string_transformer():
         "wth-",
     ]
     assert df_out.columns.values.tolist() == common_substrings
+
+
+def test_counter_transformer():
+    class CharacterCount(CounterTransformer):
+        def create_counter(self, x):
+            # count characters
+            return Counter(list(x))
+
+    out = CharacterCount().fit_transform(["aaa", "bbb", "abc"])
+
+    assert set(out.columns) == set("abc")
+    assert out["a"].values.tolist() == [3, 0, 1]
+    assert out["b"].values.tolist() == [0, 3, 1]
+    assert out["c"].values.tolist() == [0, 0, 1]
