@@ -1,3 +1,5 @@
+![Transformers turns API data into ML-ready dataframes](.github/image.png)
+
 # StartupRadar Transformers
 
 This python package allows you to integrate the [StartupRadar API](https://api.startupradar.co/docs) 
