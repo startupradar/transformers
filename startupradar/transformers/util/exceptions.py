@@ -16,3 +16,7 @@ class StartupRadarAPIWrapperError(RuntimeError):
 
 class InvalidDomainError(StartupRadarAPIWrapperError):
     pass
+
+
+class NotInCacheException(Exception):
+    pass

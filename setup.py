@@ -2,7 +2,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name="startupradar-transformers",
-    version="0.1.0",
+    version="0.2.0",
     packages=find_namespace_packages(include=["startupradar.*"]),
     install_requires=[
         "pandas",
@@ -10,6 +10,6 @@ setup(
         "requests",
         "tldextract",
         "numpy",
-        "cachecontrol[filecache]",
+        "minimalkv",
     ],
 )
