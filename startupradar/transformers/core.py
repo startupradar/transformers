@@ -5,6 +5,7 @@ import logging
 from abc import ABC
 from collections import Counter
 from functools import cached_property, lru_cache
+from random import shuffle
 
 import numpy as np
 import pandas as pd
@@ -89,6 +90,10 @@ class LinkTransformer(SeriesTransformer):
         return df
 
     def _gen_tuples(self, domains):
+        # shuffle to leverage multi-core pipeline with caching
+        domains = list(domains)
+        shuffle(domains)
+
         for domain in domains:
             for link in self._fetch_links(domain):
                 yield domain, link["domain"]
