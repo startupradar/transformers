@@ -139,7 +139,7 @@ class StartupRadarAPI:
             logging.info(f"fetching uncached ({endpoint=})")
             result = self._request(endpoint)
 
-            logging.info(f"caching results ({endpoint=})")
+            logging.debug(f"caching results ({endpoint=})")
             self.cache.put(endpoint, result)
 
         return result
@@ -147,7 +147,7 @@ class StartupRadarAPI:
     def _request_paged(self, endpoint: str, max_pages=MAX_PAGES_DEFAULT):
         result_cache = self.get_cached_or_none(endpoint)
         if result_cache:
-            logging.info(f"fetched from cache ({endpoint=})")
+            logging.debug(f"fetched from cache ({endpoint=})")
             result = self.cache.get(endpoint)
         else:
             logging.info(f"fetching uncached {endpoint=}")
@@ -166,7 +166,7 @@ class StartupRadarAPI:
 
             result = list(chain(*pages))
 
-            logging.info("caching result")
+            logging.debug(f"caching result ({endpoint=})")
             self.cache.put(endpoint, result)
 
         return result
