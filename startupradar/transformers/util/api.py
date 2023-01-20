@@ -255,3 +255,10 @@ def is_valid_domain(domain: str):
         return True
     except InvalidDomainError:
         return False
+
+
+def get_text_or_empty_dict(api, domain) -> dict:
+    try:
+        return api.get_text(domain)
+    except NotFoundError:
+        return {}

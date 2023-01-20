@@ -12,7 +12,7 @@ import pandas as pd
 from sklearn.base import TransformerMixin
 
 from startupradar.transformers.basic import CounterTransformer
-from startupradar.transformers.util.api import StartupRadarAPI
+from startupradar.transformers.util.api import StartupRadarAPI, get_text_or_empty_dict
 from startupradar.transformers.util.exceptions import NotFoundError
 
 N_DEFAULT = 10
@@ -124,6 +124,13 @@ class DomainTextTransformer(SeriesTransformer):
     def transform(self, X, y=None):
         super().transform(X, y)
         assert isinstance(X, pd.Series)
+
+        if self.api.is_cached:
+            # shuffle to fetch parallelized
+            domains = list(X)
+            shuffle(domains)
+            map(get_text_or_empty_dict, domains)
+
         series = X.apply(self._fetch_text)
         df = pd.DataFrame(series)
         df.columns = ["text"]

@@ -4,23 +4,11 @@ Classes used to export human-readable data.
 import logging
 import typing
 from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
 
 import pandas as pd
 
 from startupradar.transformers.core import BacklinkTypeCounter
-from startupradar.transformers.util.api import StartupRadarAPI
-from startupradar.transformers.util.exceptions import NotFoundError
-
-
-@lru_cache
-def get_text_or_none(api, domain) -> dict:
-    # needs caching as it gets called from different places
-    # which would result in several /text calls
-    try:
-        return api.get_text(domain)
-    except NotFoundError:
-        return {}
+from startupradar.transformers.util.api import StartupRadarAPI, get_text_or_empty_dict
 
 
 def tqdm_if_installed(iterable, total=None):
@@ -100,7 +88,7 @@ class DomainExport:
         return df_backlinks
 
     def _get_meta_description_capped(self, domain: str):
-        result = get_text_or_none(self.api, domain)
+        result = get_text_or_empty_dict(self.api, domain)
 
         meta_desc = result.get("html_meta_description", None)
         if meta_desc and len(meta_desc) > self.META_DESCRIPTION_CUTOFF:
