@@ -101,7 +101,7 @@ class StartupRadarAPI:
     def get_cached_or_none(self, endpoint):
         try:
             return self.cache.get(endpoint)
-        except KeyError:
+        except NotInCacheException:
             return None
 
     def _request(self, endpoint: str, params: dict = None):
