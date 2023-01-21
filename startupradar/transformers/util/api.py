@@ -127,12 +127,13 @@ class StartupRadarAPI:
     def _request_with_cache(self, endpoint: str, params: dict = None):
         if params:
             logging.warning(
-                f"raw request, cannot cache params ({endpoint=}, {params=})"
+                f"cannot cache params, requesting un-cached ({endpoint=}, {params=})"
             )
             return self._request(endpoint, params)
 
         result_cache = self.get_cached_or_none(endpoint)
-        if result_cache:
+        # falsy is not sufficient -> empty results like lists
+        if result_cache is not None:
             logging.debug(f"fetched from cache ({endpoint=})")
             result = result_cache
         else:
@@ -146,7 +147,8 @@ class StartupRadarAPI:
 
     def _request_paged(self, endpoint: str, max_pages=MAX_PAGES_DEFAULT):
         result_cache = self.get_cached_or_none(endpoint)
-        if result_cache:
+        # falsy is not sufficient -> empty lists
+        if result_cache is not None:
             logging.debug(f"fetched from cache ({endpoint=})")
             result = self.cache.get(endpoint)
         else:
