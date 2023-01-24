@@ -17,6 +17,7 @@ def test_api_404_raises():
     # I mock it all
     # I mock it all
     # and I mock it now...
+    # https://www.youtube.com/watch?v=hFDcoX7s6rE
 
     mock_response = Mock()
     mock_response.status_code = 404
