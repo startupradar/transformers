@@ -21,6 +21,7 @@ All transformers in this module require API access.
 - `BacklinkTransformer`: Create columns for all the domains that link to the given domain
 - `DomainTextTransformer`: Create a text column with the homepage text of the given domain
 - `BacklinkTypeCounter`: Counts the types of pages that link to a specific domain
+- `WhoisTransformer`: Add whois-based data to domains (created, updated, expires)
 
 ### startupradar.transformers.basic
 Transformers in this module work with DataFrames and provide useful feature generation on domains.

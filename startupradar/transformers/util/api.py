@@ -4,6 +4,7 @@ Classes to access the StartupRadar API.
 import json
 import logging
 from abc import ABC
+from datetime import datetime
 from enum import Enum
 from itertools import chain
 from urllib.parse import urljoin, quote
@@ -278,6 +279,22 @@ class StartupRadarAPI:
 
     def get_sources(self):
         return self._request_with_cache("/sources")
+
+    def get_whois(self, domain: str):
+        ensure_valid_domain(domain)
+        endpoint = f"/web/domains/{domain}/whois"
+        resp_raw = self._request_with_cache(endpoint)
+        return {
+            k: parse_date_or_none(resp_raw[k])
+            for k in ["created", "changed", "expires"]
+        }
+
+
+def parse_date_or_none(raw: str):
+    if not raw:
+        return None
+
+    return datetime.strptime(raw, "%Y-%m-%d")
 
 
 def ensure_valid_domain(domain: str):

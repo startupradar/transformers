@@ -111,4 +111,116 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+    method: HEAD
+    uri: http://pointnine.vc/
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '162'
+      Content-Type:
+      - text/html
+      Date:
+      - Tue, 24 Jan 2023 12:36:36 GMT
+      Location:
+      - http://www.pointninecap.com/
+      Server:
+      - UD Forwarding 3.1
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+    method: HEAD
+    uri: http://www.pointninecap.com/
+  response:
+    body:
+      string: ''
+    headers:
+      Content-Encoding:
+      - ''
+      Content-Length:
+      - '147'
+      Content-Type:
+      - text/html
+      Date:
+      - Tue, 24 Jan 2023 12:36:38 GMT
+      ETag:
+      - '"f0b70ba51cf2018f003d356b30c53f28"'
+      Last-Modified:
+      - Thu, 23 Jul 2020 10:27:48 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - aJTuMzLMOMu1A0Vzsv0vvinJbaUa6NlVfILY1RA6MsCwQ6Hfu7TIMzEtWh8i9CzkWA5yvQR7qhI=
+      x-amz-meta-content-md5:
+      - f0b70ba51cf2018f003d356b30c53f28
+      x-amz-request-id:
+      - KM1FZJ326H7QJK26
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+    method: HEAD
+    uri: http://www.pointninecap.com/
+  response:
+    body:
+      string: ''
+    headers:
+      Content-Encoding:
+      - ''
+      Content-Length:
+      - '147'
+      Content-Type:
+      - text/html
+      Date:
+      - Tue, 24 Jan 2023 12:36:38 GMT
+      ETag:
+      - '"f0b70ba51cf2018f003d356b30c53f28"'
+      Last-Modified:
+      - Thu, 23 Jul 2020 10:27:48 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - aj7G60lC0Xw4yaruVl99P9Sx9TRTmDkHBxo6sO8xpzmC9ziSLP+kLmLrMaxu1XUplFR+BRbFJlk=
+      x-amz-meta-content-md5:
+      - f0b70ba51cf2018f003d356b30c53f28
+      x-amz-request-id:
+      - KM18JMA1QQRV2MCB
+    status:
+      code: 200
+      message: OK
 version: 1

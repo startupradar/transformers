@@ -4,6 +4,7 @@ Core transformers mapping directly to API functionality.
 import logging
 from abc import ABC
 from collections import Counter
+from datetime import datetime
 from functools import cached_property, lru_cache
 from random import shuffle
 
@@ -163,3 +164,59 @@ class BacklinkTypeCounter(CounterTransformer):
     @cached_property
     def type_per_domain(self) -> dict:
         return {s["domain"]: s["category"] for s in self.api.get_sources()}
+
+
+class WhoisTransformer(SeriesTransformer):
+    """
+    Transformer to add whois-based information.
+    """
+
+    COLUMNS_DEFAULT = ("created", "changed", "expires")
+    COLUMNS_AGE = ("days_since_created", "days_since_changed")
+
+    def __init__(
+        self, api, add_timestamps=True, add_ages=True, today: datetime.date = None
+    ):
+        super().__init__(api)
+        self.add_timestamps = add_timestamps
+        self.add_ages = add_ages
+
+        self.today = datetime.today()
+        if today:
+            self.today = today
+
+    def transform(self, X, y=None):
+        def get_age_or_none(d: datetime.date):
+            if not d:
+                return None
+
+            return (datetime.today() - d).total_seconds() / 60 / 60 / 24
+
+        whoises = [self.api.get_whois(d) for d in X.tolist()]
+        df_whoises = pd.DataFrame(whoises, index=X)
+
+        if self.add_ages:
+            df_whoises["days_since_created"] = df_whoises["created"].apply(
+                get_age_or_none
+            )
+            df_whoises["days_since_changed"] = df_whoises["changed"].apply(
+                get_age_or_none
+            )
+
+        # ensure ordered columns, since dict keys could be scrambled
+        return df_whoises[self.get_feature_names_out()]
+
+    def get_params(self, deep=False):
+        return {"api": self.api, "add_ages": self.add_ages, "today": self.today}
+
+    def get_feature_names_out(self, feature_names_in=None):
+        # output must be list in order to be used as columns index
+        columns_out = []
+
+        if self.add_timestamps:
+            columns_out.extend(self.COLUMNS_DEFAULT)
+
+        if self.add_ages:
+            columns_out.extend(self.COLUMNS_AGE)
+
+        return columns_out

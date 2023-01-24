@@ -8,7 +8,8 @@ from startupradar.transformers.util.api import StartupRadarAPI
 
 @pytest.fixture
 def api():
-    return StartupRadarAPI(api_key="demo", session_factory=requests.Session)
+    # set wrong api key to raise errors
+    return StartupRadarAPI(api_key="wrong", session_factory=requests.Session)
 
 
 def domain_to_dict(domain: str):
