@@ -205,11 +205,14 @@ class StartupRadarAPI:
                 logging.info(f"fetching uncached ({endpoint=})")
                 result = result_fetcher()
                 cached_response = CachedResponse(ResponseStatus.OK, result)
-            except NotFoundError:
+            except NotFoundError as e:
                 # real request resulted in 404
                 # -> store 404
                 logging.debug(f"got 404, storing not found in cache ({endpoint=})")
                 cached_response = CachedResponse(ResponseStatus.NOT_FOUND)
+
+                # re-raise to still get NotFoundError
+                raise e
 
             logging.debug(f"caching result ({endpoint=}, {cached_response=})")
             self.cache.put(endpoint, cached_response)
