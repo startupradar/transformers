@@ -192,7 +192,14 @@ class WhoisTransformer(SeriesTransformer):
 
             return (datetime.today() - d).total_seconds() / 60 / 60 / 24
 
-        whoises = [self.api.get_whois(d) for d in X.tolist()]
+        def get_whois_or_empty(domain: str):
+            try:
+                return self.api.get_whois(domain)
+            except NotFoundError:
+                # return columns to ensure df has all columns, even if no whois exists
+                return {"created": None, "changed": None, "expires": None}
+
+        whoises = [get_whois_or_empty(d) for d in X.tolist()]
         df_whoises = pd.DataFrame(whoises, index=X)
 
         if self.add_ages:
