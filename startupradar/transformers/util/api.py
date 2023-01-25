@@ -199,25 +199,29 @@ class StartupRadarAPI:
             # raise error to mimic real api
             if cached_response.is_not_found():
                 raise NotFoundError()
+            return cached_response.data
         except NotInCacheException:
             # do a real request
             try:
                 logging.info(f"fetching uncached ({endpoint=})")
+
+                # this can raise not found
                 result = result_fetcher()
+
+                # cache and return
                 cached_response = CachedResponse(ResponseStatus.OK, result)
+                self.cache.put(endpoint, cached_response)
+
+                return cached_response.data
             except NotFoundError as e:
                 # real request resulted in 404
                 # -> store 404
                 logging.debug(f"got 404, storing not found in cache ({endpoint=})")
                 cached_response = CachedResponse(ResponseStatus.NOT_FOUND)
+                self.cache.put(endpoint, cached_response)
 
                 # re-raise to still get NotFoundError
                 raise e
-
-            logging.debug(f"caching result ({endpoint=}, {cached_response=})")
-            self.cache.put(endpoint, cached_response)
-
-        return cached_response.data
 
     def get(self):
         endpoint = "/"
