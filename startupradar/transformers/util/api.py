@@ -246,6 +246,11 @@ class StartupRadarAPI:
             has_results = len(response) > 0
             page += 1
 
+    def get_homepage(self, domain: str) -> dict:
+        ensure_valid_domain(domain)
+        endpoint = f"/web/domains/{domain}/homepage"
+        return self._request_with_cache(endpoint)
+
     def get_text(self, domain: str):
         ensure_valid_domain(domain)
 
