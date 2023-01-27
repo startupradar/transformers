@@ -301,6 +301,51 @@ class StartupRadarAPI:
             for k in ["created", "changed", "expires"]
         }
 
+    def has_text(self, domain: str):
+        try:
+            text_data = self.get_text(domain)
+            text = text_data["html_body_text"]
+            return len(text) > 0
+        except NotFoundError:
+            return False
+
+    def is_redirected(self, domain: str):
+        homepage = self.get_homepage(domain)
+        homepage_domain = tldextract.extract(homepage["url"]).registered_domain
+        return homepage_domain != domain
+
+    def filter_redirected(self, domains):
+        for domain in domains:
+            if not self.is_redirected(domain):
+                yield domain
+
+    def filter_without_homepage(self, domains: list):
+        """
+        Remove all domains without an (own) homepage.
+        """
+        domains_unredirected = self.filter_redirected(domains)
+        for domain in domains_unredirected:
+            try:
+                if self.has_text(domain):
+                    yield domain
+            except NotFoundError:
+                logging.debug(f"domain not found or data missing ({domain=})")
+            except InvalidDomainError:
+                logging.warning(f"domain invalid ({domain=})")
+
+    def filter_unknown(self, domains):
+        """
+        Remove all domains that are not tracked by StartupRadar.
+        """
+        for domain in domains:
+            try:
+                if self.get_domain(domain):
+                    yield domain
+            except NotFoundError:
+                pass
+            except InvalidDomainError:
+                logging.warning(f"invalid domain, filtered as well ({domain=})")
+
 
 def parse_date_or_none(raw: str):
     if not raw:
