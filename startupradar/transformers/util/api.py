@@ -112,6 +112,7 @@ class StartupRadarAPI:
         page_limit=PAGE_LIMIT_DEFAULT,
         max_pages=MAX_PAGES_DEFAULT,
         session_factory=None,
+        request_params=None,
         cache: CacheI = None,
     ):
         self.api_key = api_key
@@ -121,6 +122,10 @@ class StartupRadarAPI:
         self.session_factory = requests.Session
         if session_factory:
             self.session_factory = session_factory
+
+        self.request_params = {}
+        if request_params:
+            self.request_params = request_params
 
         self.cache = PassThroughCache()
         if cache:
@@ -137,7 +142,12 @@ class StartupRadarAPI:
         url = urljoin("https://api.startupradar.co/", endpoint)
         logging.debug(f"requesting endpoint ({url=}, {params=})")
         session = self.session_factory()
-        response = session.get(url, params=params, headers={"X-ApiKey": self.api_key})
+        response = session.get(
+            url,
+            params=params,
+            headers={"X-ApiKey": self.api_key},
+            **self.request_params,
+        )
 
         if response.status_code == 200:
             return response.json()
