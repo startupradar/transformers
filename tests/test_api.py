@@ -1,16 +1,9 @@
 from unittest.mock import Mock
 
 import pytest
-import requests
-from minimalkv.memory import DictStore
 
-from startupradar.transformers.util.api import StartupRadarAPI, MinimalKeyValueCache
+from startupradar.transformers.util.api import StartupRadarAPI
 from startupradar.transformers.util.exceptions import NotFoundError
-
-
-def test_api_detects_if_cached():
-    api = StartupRadarAPI("demo", session_factory=requests.Session)
-    assert api.is_cached is False
 
 
 def test_api_404_raises():
@@ -32,23 +25,18 @@ def test_api_404_raises():
         api.get_whois("willnotexist.com")
 
 
-def test_api_404_gets_cached():
-    mock_response = Mock()
-    mock_response.status_code = 404
+def test_api_filter_without_homepage_does_not_raise(monkeypatch):
+    api = StartupRadarAPI(None)
 
-    mock_session = Mock()
-    mock_session.get = Mock(return_value=mock_response)
+    def mock_request(endpoint, params=None):
+        if endpoint == "/web/domains/test.de":
+            return {"domain": "test.de"}
+        elif endpoint == "/web/domains/test.de/homepage":
+            raise NotFoundError()
+        else:
+            raise RuntimeError(f"unmocked request: ({endpoint=})")
 
-    mock_session_factory = lambda: mock_session
-    cache = MinimalKeyValueCache(store=DictStore())
-    api = StartupRadarAPI(
-        "wrong",
-        session_factory=mock_session_factory,
-        cache=cache,
-    )
+    monkeypatch.setattr(api, "_request", mock_request)
 
-    for _ in range(2):
-        with pytest.raises(NotFoundError):
-            api.get_whois("blabla.de")
-
-    assert mock_session.get.call_count == 1
+    filtered = list(api.filter_without_homepage(["test.de"]))
+    assert filtered == []

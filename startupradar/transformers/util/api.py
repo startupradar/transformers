@@ -333,10 +333,9 @@ class StartupRadarAPI:
         """
         Remove all domains without an (own) homepage.
         """
-        domains_unredirected = self.filter_redirected(domains)
-        for domain in domains_unredirected:
+        for domain in domains:
             try:
-                if self.has_text(domain):
+                if not self.is_redirected(domain) and self.has_text(domain):
                     yield domain
             except NotFoundError:
                 logging.debug(f"domain not found or data missing ({domain=})")
