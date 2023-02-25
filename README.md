@@ -22,6 +22,8 @@ All transformers in this module require API access.
 - `DomainTextTransformer`: Create a text column with the homepage text of the given domain
 - `BacklinkTypeCounter`: Counts the types of pages that link to a specific domain
 - `WhoisTransformer`: Add whois-based data to domains (created, updated, expires)
+- `SocialsTransformer`: Adds boolean attributes indicating whether a domain has linked social media accounts
+  (currently twitter, linkedin, crunchbase, facebook, instagram, and email)
 
 ### startupradar.transformers.basic
 Transformers in this module work with DataFrames and provide useful feature generation on domains.

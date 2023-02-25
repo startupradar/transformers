@@ -227,3 +227,20 @@ class WhoisTransformer(SeriesTransformer):
             columns_out.extend(self.COLUMNS_AGE)
 
         return columns_out
+
+
+class SocialsTransformer(ApiTransformer):
+    """
+    Uses the socials endpoint to generate a dataframe.
+    """
+
+    def transform(self, X, y=None):
+        # make socials dataframe
+        socials = X.apply(lambda domain: self.api.get_socials(domain))
+        df_socials = pd.DataFrame.from_records(socials, index=X)
+
+        # check that all columns exist
+        df = pd.DataFrame(index=X)
+        for col in df_socials.columns:
+            df[f"has_{col}"] = df_socials[col].notna()
+        return df
