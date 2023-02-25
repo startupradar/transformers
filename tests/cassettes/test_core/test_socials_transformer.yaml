@@ -1,0 +1,242 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/startupradar.co/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:38 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/karllorey.com/socials
+  response:
+    body:
+      string: '{"twitter_url":"https://twitter.com/karllorey","facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":"https://www.instagram.com/karllorey","email":null}'
+    headers:
+      Content-Length:
+      - '176'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:38 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/karllorey.de/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:38 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/does-not-exist-sdfsdfsd.xyz/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:38 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/startupradar.co/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:39 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/karllorey.com/socials
+  response:
+    body:
+      string: '{"twitter_url":"https://twitter.com/karllorey","facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":"https://www.instagram.com/karllorey","email":null}'
+    headers:
+      Content-Length:
+      - '176'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:39 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/karllorey.de/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:39 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+      X-ApiKey:
+      - demo
+    method: GET
+    uri: https://api.startupradar.co/web/domains/does-not-exist-sdfsdfsd.xyz/socials
+  response:
+    body:
+      string: '{"twitter_url":null,"facebook_url":null,"linkedin_url":null,"crunchbase_url":null,"instagram_url":null,"email":null}'
+    headers:
+      Content-Length:
+      - '116'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 25 Feb 2023 14:09:39 GMT
+      Server:
+      - uvicorn
+    status:
+      code: 200
+      message: OK
+version: 1

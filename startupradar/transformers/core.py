@@ -235,9 +235,17 @@ class SocialsTransformer(SeriesTransformer):
     """
 
     def transform(self, X, y=None):
+        def get_socials_or_none(domain):
+            # return empty dict to avoid indexing errors
+            try:
+                socials = self.api.get_socials(domain)
+                return socials if socials else {}
+            except NotFoundError:
+                return {}
+
         # make socials dataframe
-        socials = X.apply(lambda domain: self.api.get_socials(domain))
-        df_socials = pd.DataFrame.from_records(socials, index=X)
+        socials = X.apply(get_socials_or_none)
+        df_socials = pd.DataFrame.from_records(socials, index=X.to_list())
 
         # check that all columns exist
         df = pd.DataFrame(index=X)

@@ -74,18 +74,24 @@ def test_whois_transformer(api):
         assert df_out[col].dtype == np.dtype("datetime64[ns]")
 
 
-def test_socials_transformer(mock_api):
-    t = SocialsTransformer(mock_api)
+@pytest.mark.vcr
+def test_socials_transformer(api):
+    t = SocialsTransformer(api)
 
     # transform list of domains
-    domains = ["startupradar.co"]
-    series = pd.Series(domains)
-    result = t.transform(series)
+    domains = [
+        "startupradar.co",
+        "karllorey.com",
+        "karllorey.de",
+        "does-not-exist-sdfsdfsd.xyz",
+    ]
+    domain_series = pd.Series(domains)
+    result = t.transform(domain_series)
 
     # check that if socials is not none
     # the result is true
     for domain in domains:
-        socials = mock_api.get_socials(domain)
+        socials = api.get_socials(domain)
         row = result.loc[domain]
         for key, value in socials.items():
             assert row[f"has_{key}"] == (socials[key] is not None)
