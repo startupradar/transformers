@@ -229,7 +229,7 @@ class WhoisTransformer(SeriesTransformer):
         return columns_out
 
 
-class SocialsTransformer(ApiTransformer):
+class SocialsTransformer(SeriesTransformer):
     """
     Uses the socials endpoint to generate a dataframe.
     """
