@@ -13,6 +13,7 @@ import pandas as pd
 from sklearn.base import TransformerMixin
 
 from startupradar.transformers.basic import CounterTransformer
+from startupradar.transformers.config import TransformerConfig
 from startupradar.transformers.util.api import StartupRadarAPI, get_text_or_empty_dict
 from startupradar.transformers.util.exceptions import NotFoundError
 
@@ -23,8 +24,37 @@ class ApiTransformer(TransformerMixin):
     def __init__(self, api: StartupRadarAPI):
         self.api = api
 
-    def get_params(self, deep):
+    def get_params(self, deep=False):
+        # this returns the api used when initializing
+        # necessary to make GridSearchVC work without setting TransformerConfig.api
         return {"api": self.api}
+
+    def set_params(self, params):
+        self.api = params["api"]
+
+    def __getstate__(self):
+        # this data is used for pickling
+        # returns everything except the api
+        state = {k: v for k, v in self.__dict__.items() if k != "api"}
+        logging.debug(f"returning state ({self=}, {state=})")
+        return state
+
+    def __setstate__(self, state):
+        # this gets used to restore the transformer when pickling
+        # sets all the attributes and switches out the API
+
+        logging.debug(f"unpickling ({state=})")
+        for attr, value in state.items():
+            setattr(self, attr, value)
+
+        logging.debug(f"switching out api during unpickling ({TransformerConfig.api=})")
+        if not TransformerConfig.api:
+            raise RuntimeError(
+                "You're unpickling an API transformer without setting TransformerConfig.api, "
+                "please assign the desired API wrapper to TransformerConfig.api upfront"
+            )
+
+        self.api = TransformerConfig.api
 
 
 class SeriesTransformer(ApiTransformer, ABC):

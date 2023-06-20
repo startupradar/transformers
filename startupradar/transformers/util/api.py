@@ -125,6 +125,10 @@ class StartupRadarAPI:
     def is_cached(self):
         return not isinstance(self.cache, PassThroughCache)
 
+    def __repr__(self):
+        api_key_cryptic = self.api_key[:3] + "..." if self.api_key else None
+        return f"StartupRadarAPI(cache={self.cache} api_key={api_key_cryptic})"
+
     def _request(self, endpoint: str, params: dict = None):
         """
         request a single endpoint/page.

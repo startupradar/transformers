@@ -1,15 +1,15 @@
 from unittest.mock import Mock
 
 import pytest
-import requests
+from minimalkv.memory import DictStore
 
-from startupradar.transformers.util.api import StartupRadarAPI
+from startupradar.transformers.util.api import StartupRadarAPI, MinimalKeyValueCache
 
 
 @pytest.fixture
 def api():
     # set wrong api key to raise errors
-    return StartupRadarAPI(api_key="wrong", session_factory=requests.Session)
+    return StartupRadarAPI("wrong", cache=MinimalKeyValueCache(DictStore()))
 
 
 def domain_to_dict(domain: str):
