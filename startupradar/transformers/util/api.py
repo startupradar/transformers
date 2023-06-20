@@ -21,16 +21,6 @@ from startupradar.transformers.util.exceptions import (
     NotInCacheException,
 )
 
-DOMAINS_IGNORED_BACKLINKS = (
-    "google.com",
-    "facebook.com",
-    "twitter.com",
-    "instagram.com",
-    "linkedin.com",
-    "youtube.com",
-    "apple.com",
-)
-
 
 class ResponseStatus(Enum):
     OK = "ok"
@@ -163,7 +153,7 @@ class StartupRadarAPI:
                 f"({response.status_code}, {endpoint=}, {params=})"
             )
 
-    def _request_paged(self, endpoint, max_pages=MAX_PAGES_DEFAULT):
+    def _request_paged(self, endpoint, max_pages):
         """
         request and return all pages of an endpoint.
         """
@@ -177,6 +167,13 @@ class StartupRadarAPI:
             # fewer results than limit -> last page
             if len(response) < self.page_limit:
                 break
+
+        if len(pages) == max_pages:
+            logging.warning(
+                "maximum number of pages reached, "
+                "further pages are ignored "
+                f"({endpoint=}, {max_pages=})"
+            )
 
         result = list(chain(*pages))
         return result
@@ -192,7 +189,7 @@ class StartupRadarAPI:
         fetcher = lambda: self._request(endpoint)
         return self._cached_or_fetched(endpoint, fetcher)
 
-    def _request_paged_with_cache(self, endpoint: str, max_pages=MAX_PAGES_DEFAULT):
+    def _request_paged_with_cache(self, endpoint: str, max_pages: int):
         fetcher = lambda: self._request_paged(endpoint, max_pages)
         return self._cached_or_fetched(endpoint, fetcher)
 
@@ -271,22 +268,13 @@ class StartupRadarAPI:
         ensure_valid_domain(domain)
 
         endpoint = f"/web/domains/{domain}/links/domain-links"
-        return self._request_paged_with_cache(endpoint)
+        return self._request_paged_with_cache(endpoint, self.max_pages)
 
     def get_backlinks(self, domain: str):
         ensure_valid_domain(domain)
 
-        if domain in DOMAINS_IGNORED_BACKLINKS:
-            msg = (
-                "domain is in ignored domains "
-                "because it would return too many backlinks. "
-                f"Returning empty backlinks instead ({domain=})"
-            )
-            logging.warning(msg)
-            return []
-
         endpoint = f"/web/domains/{domain}/links/domain-backlinks"
-        return self._request_paged_with_cache(endpoint)
+        return self._request_paged_with_cache(endpoint, self.max_pages)
 
     def get_similar(self, domain: str):
         ensure_valid_domain(domain)
