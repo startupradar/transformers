@@ -86,7 +86,7 @@ def test_pickle_pipeline(api, tmp_path):
     pipeline.fit(df["domain"], df["target"])
 
     # pickle fitted pipeline
-    tmp_file = tmp_path.joinpath('dump.pkl')
+    tmp_file = tmp_path.joinpath("dump.pkl")
     joblib.dump(pipeline, tmp_file)
 
     # unpickle fails without TransformerConfig

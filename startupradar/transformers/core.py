@@ -264,6 +264,15 @@ class SocialsTransformer(SeriesTransformer):
     Uses the socials endpoint to generate a dataframe.
     """
 
+    COLUMNS = [
+        "has_email",
+        "has_crunchbase_url",
+        "has_linkedin_url",
+        "has_twitter_url",
+        "has_facebook_url",
+        "has_instagram_url",
+    ]
+
     def transform(self, X, y=None):
         def get_socials_or_none(domain):
             # return empty dict to avoid indexing errors
@@ -275,10 +284,14 @@ class SocialsTransformer(SeriesTransformer):
 
         # make socials dataframe
         socials = X.apply(get_socials_or_none)
-        df_socials = pd.DataFrame.from_records(socials, index=X.to_list())
+        df_socials = pd.DataFrame.from_records(socials.to_list(), index=X)
 
         # check that all columns exist
         df = pd.DataFrame(index=X)
         for col in df_socials.columns:
             df[f"has_{col}"] = df_socials[col].notna()
-        return df
+
+        return df[self.COLUMNS]
+
+    def get_feature_names_out(self, deep=False):
+        return self.COLUMNS
