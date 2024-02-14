@@ -21,6 +21,8 @@ from startupradar.transformers.util.exceptions import (
     NotInCacheException,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class ResponseStatus(Enum):
     OK = "ok"
@@ -93,6 +95,8 @@ class StartupRadarAPI:
     Class to use the StartupRadar API.
     """
 
+    BASE_URL = "https://api.startupradar.co"
+
     PAGE_LIMIT_DEFAULT = 100
     MAX_PAGES_DEFAULT = 100
 
@@ -133,8 +137,8 @@ class StartupRadarAPI:
         """
         request a single endpoint/page.
         """
-        url = urljoin("https://api.startupradar.co/", endpoint)
-        logging.debug(f"requesting endpoint ({url=}, {params=})")
+        url = urljoin(self.BASE_URL, endpoint)
+        logger.debug(f"requesting endpoint ({url=}, {params=})")
         session = self.session_factory()
         response = session.get(
             url,
@@ -173,7 +177,7 @@ class StartupRadarAPI:
                 break
 
         if len(pages) == max_pages:
-            logging.warning(
+            logger.warning(
                 "maximum number of pages reached, "
                 "further pages are ignored "
                 f"({endpoint=}, {max_pages=})"
@@ -185,7 +189,7 @@ class StartupRadarAPI:
     def _request_with_cache(self, endpoint: str, params: dict = None):
         # without cache if params exist
         if params:
-            logging.warning(
+            logger.warning(
                 f"cannot cache params, requesting un-cached ({endpoint=}, {params=})"
             )
             return self._request(endpoint, params)
@@ -205,7 +209,7 @@ class StartupRadarAPI:
         try:
             # try to load from cache
             cached_response = self.cache.get(endpoint)
-            logging.debug(f"fetched from cache ({endpoint=})")
+            logger.debug(f"fetched from cache ({endpoint=})")
 
             # raise error to mimic real api
             if cached_response.is_not_found():
@@ -214,7 +218,7 @@ class StartupRadarAPI:
         except NotInCacheException:
             # do a real request
             try:
-                logging.info(f"fetching uncached ({endpoint=})")
+                logger.info(f"fetching uncached ({endpoint=})")
 
                 # this can raise not found
                 result = result_fetcher()
@@ -227,7 +231,7 @@ class StartupRadarAPI:
             except NotFoundError as e:
                 # real request resulted in 404
                 # -> store 404
-                logging.debug(f"got 404, storing not found in cache ({endpoint=})")
+                logger.debug(f"got 404, storing not found in cache ({endpoint=})")
                 cached_response = CachedResponse(ResponseStatus.NOT_FOUND)
                 self.cache.put(endpoint, cached_response)
 
@@ -330,9 +334,9 @@ class StartupRadarAPI:
                 if not self.is_redirected(domain) and self.has_text(domain):
                     yield domain
             except NotFoundError:
-                logging.debug(f"domain not found or data missing ({domain=})")
+                logger.debug(f"domain not found or data missing ({domain=})")
             except InvalidDomainError:
-                logging.warning(f"domain invalid ({domain=})")
+                logger.warning(f"domain invalid ({domain=})")
 
     def filter_unknown(self, domains):
         """
@@ -345,7 +349,7 @@ class StartupRadarAPI:
             except NotFoundError:
                 pass
             except InvalidDomainError:
-                logging.warning(f"invalid domain, filtered as well ({domain=})")
+                logger.warning(f"invalid domain, filtered as well ({domain=})")
 
 
 def parse_date_or_none(raw: str):
