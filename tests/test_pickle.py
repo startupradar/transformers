@@ -97,5 +97,5 @@ def test_pickle_pipeline(api, tmp_path):
 
     # but works after being set
     TransformerConfig.api = api
-    gs = joblib.load("out.pkl")
+    gs = joblib.load(tmp_file)
     gs.predict(df["domain"])
