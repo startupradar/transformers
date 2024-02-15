@@ -180,6 +180,7 @@ class DomainTextTransformer(SeriesTransformer):
 
         series = X.apply(self._fetch_text)
         df = pd.DataFrame(series)
+        df.index = X
         df.columns = ["text"]
         return df
 
