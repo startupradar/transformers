@@ -1,6 +1,8 @@
 """
 sklearn transformers adapted to work on pandas DataFrames or Series'.
 """
+from abc import ABC, abstractmethod
+
 import pandas as pd
 from sklearn.base import TransformerMixin
 from sklearn.compose import ColumnTransformer
@@ -41,12 +43,15 @@ class PipelineDF(Pipeline):
         return self.steps[-1][1].get_feature_names_out(feature_names_in)
 
 
-class Vectorizer(TransformerMixin):
+class Vectorizer(TransformerMixin, ABC):
     """
     Vectorizer leveraging composition of an sklearn vectorizer to produce dataframe outputs.
     """
 
     vec = None
+
+    def __init__(self):
+        raise NotImplemented()
 
     def fit(self, docs, y=None):
         self.vec.fit(docs, y)

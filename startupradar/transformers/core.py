@@ -17,20 +17,39 @@ from startupradar.transformers.config import TransformerConfig
 from startupradar.transformers.util.api import StartupRadarAPI, get_text_or_empty_dict
 from startupradar.transformers.util.exceptions import NotFoundError
 
+MSG_TRANSFORMER_CONFIG_API_IS_NONE = (
+    "TransformerConfig.api not set, "
+    "self.api is thus None "
+    "which will result in errors when this transformer is used"
+)
+
+ENVIRONMENT_VARIABLE_FOR_API_KEY = "STARTUPRADAR_API_KEY"
+
 N_DEFAULT = 10
 
 
 class ApiTransformer(TransformerMixin):
-    def __init__(self, api: StartupRadarAPI):
-        self.api = api
+    def __init__(self, api=None):
+        if api:
+            logging.info("api passed as constructor, please set TransformerConfig.api")
+            self.api = api
+        elif TransformerConfig.api:
+            logging.debug(
+                f"setting api from TransformerConfig ({self=}, {TransformerConfig.api=})"
+            )
+            self.api = TransformerConfig.api
+        else:
+            logging.warning(MSG_TRANSFORMER_CONFIG_API_IS_NONE)
 
     def get_params(self, deep=False):
-        # this returns the api used when initializing
-        # necessary to make GridSearchVC work without setting TransformerConfig.api
-        return {"api": self.api}
+        # we cannot return the api here as it will get pickled
+        # e.g. during GridSearchCV
+        return {}
 
     def set_params(self, params):
-        self.api = params["api"]
+        if TransformerConfig.api is None:
+            logging.warning(MSG_TRANSFORMER_CONFIG_API_IS_NONE)
+        self.api = TransformerConfig.api
 
     def __getstate__(self):
         # this data is used for pickling
@@ -47,12 +66,9 @@ class ApiTransformer(TransformerMixin):
         for attr, value in state.items():
             setattr(self, attr, value)
 
-        logging.debug(f"switching out api during unpickling ({TransformerConfig.api=})")
+        logging.debug(f"setting api through set_state {TransformerConfig.api}")
         if not TransformerConfig.api:
-            raise RuntimeError(
-                "You're unpickling an API transformer without setting TransformerConfig.api, "
-                "please assign the desired API wrapper to TransformerConfig.api upfront"
-            )
+            logging.warning(MSG_TRANSFORMER_CONFIG_API_IS_NONE)
 
         self.api = TransformerConfig.api
 
@@ -79,7 +95,7 @@ class LinkTransformer(SeriesTransformer):
     Creates columns for all domains the given domain links to.
     """
 
-    def __init__(self, api, n: int = N_DEFAULT):
+    def __init__(self, api=None, n: int = N_DEFAULT):
         super().__init__(api)
         self._domains = None
         self.n = n
@@ -178,10 +194,11 @@ class DomainTextTransformer(SeriesTransformer):
         return ["text"]
 
 
-class BacklinkTypeCounter(CounterTransformer):
-    def __init__(self, api: StartupRadarAPI):
-        super().__init__()
-        self.api = api
+class BacklinkTypeCounter(CounterTransformer, ApiTransformer):
+    def __init__(self, api: StartupRadarAPI = None):
+        # we're using multi-inheritance here to use both base classes
+        # not sure if this is a good idea
+        ApiTransformer.__init__(self, api)
 
     def create_counter(self, domain: str) -> Counter:
         links = self.api.get_backlinks(domain)
@@ -205,7 +222,7 @@ class WhoisTransformer(SeriesTransformer):
     COLUMNS_AGE = ("days_since_created", "days_since_changed")
 
     def __init__(
-        self, api, add_timestamps=True, add_ages=True, today: datetime.date = None
+        self, api=None, add_timestamps=True, add_ages=True, today: datetime.date = None
     ):
         super().__init__(api)
         self.add_timestamps = add_timestamps
@@ -244,7 +261,10 @@ class WhoisTransformer(SeriesTransformer):
         return df_whoises[self.get_feature_names_out()]
 
     def get_params(self, deep=False):
-        return {"api": self.api, "add_ages": self.add_ages, "today": self.today}
+        return {"add_ages": self.add_ages, "today": self.today}
+
+    def set_params(self, params):
+        super().set_params(params)
 
     def get_feature_names_out(self, feature_names_in=None):
         # output must be list in order to be used as columns index

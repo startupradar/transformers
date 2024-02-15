@@ -3,17 +3,34 @@ import logging
 import joblib
 import pandas as pd
 import pytest
-from minimalkv.memory import DictStore
+from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.exceptions import NotFittedError
 from sklearn.feature_selection import SelectKBest
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 
 from startupradar.transformers import core, basic, pandas
 from startupradar.transformers.config import TransformerConfig
 from startupradar.transformers.helpers import TurnToIter
-from startupradar.transformers.util.api import StartupRadarAPI, MinimalKeyValueCache
+from startupradar.transformers.util.api import StartupRadarAPI
+
+
+class NotPickleableAPI(StartupRadarAPI):
+    """
+    Manually make this API not pickleable to ensure it's never tried to be pickled.
+    """
+
+    def __init__(self):
+        super().__init__("")
+
+    def __getstate__(self):
+        raise RuntimeError("this object got pickled")
+
+    def __setstate__(self, state):
+        raise RuntimeError("this object got un-pickled")
+
 
 TRANSFORMERS = [
     # basic
@@ -22,37 +39,42 @@ TRANSFORMERS = [
     basic.CounterTransformer(),
     basic.DomainNameTransformer(),
     # core
-    core.LinkTransformer(None),
-    core.BacklinkTransformer(None),
-    core.BacklinkTypeCounter(None),
-    core.DomainTextTransformer(None),
-    core.WhoisTransformer(None),
+    core.LinkTransformer(NotPickleableAPI()),
+    core.BacklinkTransformer(NotPickleableAPI()),
+    core.BacklinkTypeCounter(NotPickleableAPI()),
+    core.DomainTextTransformer(NotPickleableAPI()),
+    core.WhoisTransformer(NotPickleableAPI()),
     # pandas
     pandas.ColumnTransformerDF([]),
     pandas.CountVectorizerDF(),
     pandas.FeatureUnionDF([]),
     pandas.OneHotEncoderDF(),
-    pandas.PipelineDF([]),
+    pandas.PipelineDF([("test", ColumnTransformer([], remainder="passthrough"))]),
     pandas.TfidfVectorizerDF(),
-    pandas.Vectorizer(),
+    # pandas.Vectorizer(),
 ]
 
 
 @pytest.mark.parametrize("transformer", TRANSFORMERS)
 def test_pickle(transformer, tmp_path):
-    TransformerConfig.api = StartupRadarAPI(None)
-    joblib.dump(transformer, tmp_path.joinpath("transformer.pkl"))
-    transformer = joblib.load(tmp_path.joinpath("transformer.pkl"))
+    pkl_file_path = tmp_path.joinpath("transformer.pkl")
+
+    # dump
+    joblib.dump(transformer, pkl_file_path)
+
+    # load again
+    TransformerConfig.api = NotPickleableAPI()
+    transformer = joblib.load(pkl_file_path)
+
     assert transformer is not None
 
 
 @pytest.mark.vcr
 def test_pickle_pipeline(api, tmp_path):
-    TransformerConfig.api = None
-
+    TransformerConfig.api = api
     pipeline = pandas.PipelineDF(
         [
-            ("get", core.DomainTextTransformer(api=api)),
+            ("get", core.DomainTextTransformer()),
             ("iter", TurnToIter()),
             ("tfidf", pandas.TfidfVectorizerDF(max_features=10)),
             (
@@ -89,13 +111,33 @@ def test_pickle_pipeline(api, tmp_path):
     tmp_file = tmp_path.joinpath("dump.pkl")
     joblib.dump(pipeline, tmp_file)
 
-    # unpickle fails without TransformerConfig
-    with pytest.raises(RuntimeError):
-        logging.info(f"{TransformerConfig.api=}")
-        gs = joblib.load(tmp_file)
-        gs.predict(df["domain"])
-
     # but works after being set
     TransformerConfig.api = api
     gs = joblib.load(tmp_file)
     gs.predict(df["domain"])
+
+
+class FakePipeline(Pipeline):
+    def score(self, **kwargs):
+        return 0
+
+
+@pytest.mark.parametrize(
+    "transformer", TRANSFORMERS, ids=map(lambda t: type(t), TRANSFORMERS)
+)
+def test_gridsearch(transformer, tmp_path):
+    tmp_file = tmp_path.joinpath("pipeline.pkl")
+    assert not tmp_file.is_file()
+    pipeline = FakePipeline(
+        [
+            ("transformer", transformer),
+        ]
+    )
+
+    TransformerConfig.api = NotPickleableAPI()
+    gs = GridSearchCV(pipeline, {}, n_jobs=2, cv=2)
+    try:
+        gs.fit(pd.DataFrame(range(10)))
+    except ValueError:
+        pass
+    # joblib.dump(pipeline, tmp_file)
