@@ -51,7 +51,7 @@ class Vectorizer(TransformerMixin, ABC):
     vec = None
 
     def __init__(self):
-        raise NotImplemented()
+        pass
 
     def fit(self, docs, y=None):
         self.vec.fit(docs, y)
@@ -60,6 +60,11 @@ class Vectorizer(TransformerMixin, ABC):
     def transform(self, docs):
         out_raw = self.vec.transform(docs)
         df = pd.DataFrame(out_raw.todense(), columns=self.vec.get_feature_names_out())
+
+        # re-add index
+        if isinstance(docs, pd.Series):
+            df.index = docs.index
+
         return df
 
     def get_feature_names_out(self, feature_names_in=None):
