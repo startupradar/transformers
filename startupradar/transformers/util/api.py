@@ -113,9 +113,10 @@ class StartupRadarAPI:
         self.page_limit = page_limit
         self.max_pages = max_pages
 
-        self.session_factory = requests.Session
         if session_factory:
-            self.session_factory = session_factory
+            self.session = session_factory()
+        else:
+            self.session = requests.Session()
 
         self.request_params = {}
         if request_params:
@@ -139,8 +140,7 @@ class StartupRadarAPI:
         """
         url = urljoin(self.BASE_URL, endpoint)
         logger.debug(f"requesting endpoint ({url=}, {params=})")
-        session = self.session_factory()
-        response = session.get(
+        response = self.session.get(
             url,
             params=params,
             headers={"X-ApiKey": self.api_key},
